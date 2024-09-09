@@ -6,6 +6,7 @@ import com.hibob.academy.service.SessionService
 import io.jsonwebtoken.Jwts
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
+import jakarta.ws.rs.core.NewCookie
 import jakarta.ws.rs.core.Response
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Controller
@@ -21,7 +22,9 @@ class UserApi(private val service: SessionService) {
     @Path("/login")
     fun addUser(@RequestBody user: User): Response {
         val token = service.createJwtToken(user)
-        return Response.ok(token)
+        val cookie = NewCookie("JWT", token, "/", null, null, 3600, false)
+
+        return Response.ok().cookie(cookie)
             .build()
     }
 

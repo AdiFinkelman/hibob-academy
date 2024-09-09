@@ -7,23 +7,25 @@ import io.jsonwebtoken.Jwts
 import jakarta.ws.rs.container.ContainerRequestContext
 import jakarta.ws.rs.container.ContainerRequestFilter
 import jakarta.ws.rs.core.Response
+import jakarta.ws.rs.ext.Provider
 import org.springframework.stereotype.Component
 import javax.crypto.SecretKey
 
 @Component
+@Provider
 class AuthenticationFilter(private val sessionService: SessionService) : ContainerRequestFilter {
     override fun filter(requestContext: ContainerRequestContext) {
 
         if (requestContext.uriInfo.path == "adi/usersession/login") {
             return
         }
-        val authHeader = requestContext.headers.getFirst("Authorization")
+        val authHeader = requestContext.cookies["Authorization"]?.value?.trim()
         val token = authHeader?.substringAfter("Bearer ")
 
         if (verify(token) == null) {
             requestContext.abortWith(
                 Response.status(Response.Status.UNAUTHORIZED)
-                    .entity("User cannot access the resource.")
+                    .entity("User cannot access the resource")
                     .build()
             )
         }
