@@ -20,7 +20,7 @@ class AuthenticationFilter(private val sessionService: SessionService) : Contain
         val authHeader = requestContext.headers.getFirst("Authorization")
         val token = authHeader?.substringAfter("Bearer ")
 
-        if (token == null || verify(token) == null) {
+        if (verify(token) == null) {
             requestContext.abortWith(
                 Response.status(Response.Status.UNAUTHORIZED)
                     .entity("User cannot access the resource.")
@@ -29,7 +29,6 @@ class AuthenticationFilter(private val sessionService: SessionService) : Contain
         }
     }
 
-    // Verifies the JWT token
     fun verify(token: String?): Jws<Claims>? {
         return try {
             Jwts.parserBuilder()
@@ -37,7 +36,6 @@ class AuthenticationFilter(private val sessionService: SessionService) : Contain
                 .build()
                 .parseClaimsJws(token)
         } catch (e: Exception) {
-            // Return null if the token is invalid or expired
             null
         }
     }
