@@ -18,17 +18,23 @@ class UserApi(private val service: SessionService) {
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-
+    @Path("/login")
     fun addUser(@RequestBody user: User): Response {
         val token = service.createJwtToken(user)
         return Response.ok(token)
             .build()
     }
+
+    @GET
+    @Path("/test")
+    fun doSomething(): String {
+        return "{}"
+    }
 }
 
 data class User
     (
-    val email: String, val username: String, val isAdmin: Boolean
+    val email: String, val username: String, val isAdmin: Boolean,
 )
 
 

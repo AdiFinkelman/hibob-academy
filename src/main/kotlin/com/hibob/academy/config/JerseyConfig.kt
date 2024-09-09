@@ -1,6 +1,8 @@
 package com.hibob.academy.config
 
+import com.hibob.academy.filters.AuthenticationFilter
 import org.glassfish.jersey.server.ResourceConfig
+import org.glassfish.jersey.server.spring.SpringComponentProvider
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Configuration
 
@@ -11,6 +13,8 @@ class JerseyInitializer : ResourceConfig() {
 
     init {
         logger.info("initializing jersey config")
-        packages("com.hibob")
+        register(SpringComponentProvider::class.java)
+        register(AuthenticationFilter::class.java)
+        packages("com.hibob.academy.resource")
     }
 }
