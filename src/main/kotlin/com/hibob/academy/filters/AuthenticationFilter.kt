@@ -10,20 +10,21 @@ import org.apache.tomcat.util.http.parser.Cookie
 import org.springframework.stereotype.Component
 
 @Component
-class AuthenticationFilter : ContainerRequestFilter {
+class AuthenticationFilter(private val sessionService: SessionService) : ContainerRequestFilter {
     override fun filter(requestContext: ContainerRequestContext) {
 
-        if (requestContext.uriInfo.path == "TO BE IMPLEMENT") return
+        if (requestContext.uriInfo.path == "/adi/usersession") return
 
     }
 
-//    fun verify(cookie: String?): Jws<Claims>? {
-//        val sessionService = SessionService()
-//        cookie?.let {
-//        try {
-//            Jwts.parser().setSigningKey(sessionService.secretKey).parseClaimsJws(cookie)
-//        } catch (e: Exception) {
-//            null
-//        }
-//    }
+    fun verify(token: String?): Jws<Claims>? {
+        return try {
+            Jwts.parserBuilder()
+                .setSigningKey(sessionService.secretKey)
+                .build()
+                .parseClaimsJws(token)
+        } catch (e: Exception) {
+            null
+        }
+    }
 }
