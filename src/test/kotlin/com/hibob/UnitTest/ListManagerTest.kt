@@ -5,9 +5,9 @@ import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.Assertions.*
 
 class ListManagerTest {
+    private val listManager = ListManager()
     private val person = Person("Adi", 28)
     private val baby = Person("Ori", 1)
-    private val listManager = ListManager()
 
     // addPerson
     @Test
@@ -86,6 +86,19 @@ class ListManagerTest {
 
         assertEquals(listOf(personWithSameName,  person), list1.getPeopleSortedByAgeAndName())
         assertEquals(listOf(person, personWithSameAge), list2.getPeopleSortedByAgeAndName())
+    }
+
+    @Test
+    fun `people list is empty` () {
+        assertEquals(null, listManager.calculateStatistics())
+    }
+
+    @Test
+    fun `is people statistic as expected` () {
+        val peopleStatistics = PeopleStatistics(14.5, baby, person, mapOf(baby.age to 1, person.age to 1))
+        listManager.addPerson(person)
+        listManager.addPerson(baby)
+        assertEquals(peopleStatistics, listManager.calculateStatistics())
     }
 
 }

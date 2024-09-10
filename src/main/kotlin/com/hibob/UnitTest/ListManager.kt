@@ -24,8 +24,16 @@ package com.hibob.UnitTest
  * Test with multiple people to ensure they are sorted first by age, then by name.
  * Test with edge cases like people with the same name but different ages and vice versa.
  *
+ * Write tests for the new function (you can use your existing test class)
  */
 data class Person(val name: String, val age: Int)
+
+data class PeopleStatistics(
+    val averageAge: Double,
+    val youngest: Person,
+    val oldest: Person,
+    val ageCount: Map<Int, Int>
+)
 
 class ListManager {
     private val people: MutableList<Person> = mutableListOf()
@@ -43,5 +51,21 @@ class ListManager {
 
     fun getPeopleSortedByAgeAndName(): List<Person> {
         return people.sortedWith(compareBy<Person> { it.age }.thenBy { it.name })
+    }
+
+    fun calculateStatistics(): PeopleStatistics? {
+        if (people.isEmpty()) {
+            return null
+        }
+        val averageAge = people.map { it.age }.average()
+        val youngest = people.minByOrNull { it.age }
+        val oldest = people.maxByOrNull { it.age }
+        val ageCount = people.groupingBy { it.age }.eachCount()
+
+        return youngest?.let { young ->
+            oldest?.let { old ->
+                PeopleStatistics(averageAge, young, old, ageCount)
+            }
+        }
     }
 }
