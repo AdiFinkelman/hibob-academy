@@ -1,19 +1,17 @@
 package com.hibob.academy.dao
 
-import java.time.LocalDate
+import java.sql.Date
 
 data class Example(val id: Long, val companyId: Long, val data: String)
 
-data class Pet(
-    val id: Int,
+data class PetData(
     val name: String,
     val type: String,
     val companyId: Int,
-    val arrivalDate: LocalDate
+    val arrivalDate: Date
 )
 
-data class Owner(
-    val id: Int,
+data class OwnerData(
     val name: String?,
     val firstName: String?,
     val lastName: String?,
