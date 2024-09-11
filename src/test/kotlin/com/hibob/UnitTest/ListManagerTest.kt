@@ -8,6 +8,7 @@ class ListManagerTest {
     private val listManager = ListManager()
     private val person = Person("Adi", 28)
     private val baby = Person("Ori", 1)
+    private val woman = Person("Dolev", 28)
 
     // addPerson
     @Test
@@ -99,6 +100,24 @@ class ListManagerTest {
         listManager.addPerson(person)
         listManager.addPerson(baby)
         assertEquals(peopleStatistics, listManager.calculateStatistics())
+    }
+
+    @Test
+    fun `people statistic for 3 people` () {
+        val peopleStatistics1 = PeopleStatistics((person.age + woman.age + baby.age)/3.0, baby, person, mapOf(baby.age to 1, person.age to 2))
+        listManager.addPerson(person)
+        listManager.addPerson(baby)
+        listManager.addPerson(woman)
+        assertEquals(peopleStatistics1, listManager.calculateStatistics())
+    }
+
+    @Test
+    fun `people statistic throw exception because same age but lex matter`() {
+        val peopleStatistics1 = PeopleStatistics((person.age + woman.age + baby.age)/3.0, baby, woman, mapOf(baby.age to 1, person.age to 2))
+        listManager.addPerson(person)
+        listManager.addPerson(baby)
+        listManager.addPerson(woman)
+        assertThrows<AssertionError> { assertEquals(peopleStatistics1, listManager.calculateStatistics()) }
     }
 
 }
