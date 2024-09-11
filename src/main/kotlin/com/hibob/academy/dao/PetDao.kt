@@ -43,12 +43,18 @@ class PetDao @Inject constructor(private val sql: DSLContext) {
             .from(pet)
             .fetch(petMapper)
 
+    fun getAllPetsByType(type: PetType): List<PetWithoutType> =
+        sql.select(pet.id, pet.name, pet.companyId, pet.dateOfArrival, pet.ownerId)
+            .from(pet)
+            .fetch(petWithoutTypeMapper)
+
     fun createNewPet(petData: Pet) {
         sql.insertInto(pet)
             .set(pet.name, petData.name)
             .set(pet.type, petData.type)
             .set(pet.companyId, petData.companyId)
             .set(pet.dateOfArrival, petData.arrivalDate)
+            .set(pet.ownerId, petData.ownerId)
             .execute()
     }
 }
