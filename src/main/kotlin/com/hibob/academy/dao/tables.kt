@@ -9,7 +9,7 @@ class PetTable(tableName: String = "pet") : JooqTable(tableName) {
     val type = createVarcharField("type")
     val companyId = createBigIntField("company_id")
     val dateOfArrival = createDateField("date_of_arrival")
-    val ownerId = createIntField("owner_id")
+    val ownerId = createBigIntField("owner_id")
 
     companion object {
         val instance = PetTable()
