@@ -18,7 +18,9 @@ class UserApi(private val service: SessionService) {
     @Path("/login")
     fun addUser(@RequestBody user: User): Response {
         val token = service.createJwtToken(user)
-        val cookie = NewCookie(AuthenticationFilter.AUTH, token, AuthenticationFilter.LOGIN_PATH, null, null, 3600, false)
+        val cookie = NewCookie.Builder(AuthenticationFilter.AUTH)
+            .value(token)
+            .build()
 
         return Response.ok().cookie(cookie)
             .build()

@@ -27,8 +27,7 @@ class AuthenticationFilter(private val sessionService: SessionService) : Contain
         if (requestContext.uriInfo.path == LOGIN_PATH) {
             return
         }
-        val authCookie = requestContext.cookies[AUTH]?.value?.trim()
-        val token = authCookie?.substringAfter("Bearer ")
+        val token = requestContext.cookies[AUTH]?.value?.trim()
 
         verify(token, requestContext)
     }
