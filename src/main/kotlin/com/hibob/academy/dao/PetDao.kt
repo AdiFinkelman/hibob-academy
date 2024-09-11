@@ -32,8 +32,8 @@ class PetDao @Inject constructor(private val sql: DSLContext) {
         )
     }
 
-    fun getAllPetsFromType(type: PetType): List<PetWithoutType> =
-        sql.select(pet.name, pet.companyId, pet.dateOfArrival)
+    fun getAllPetsByType(type: PetType): List<PetWithoutType> =
+        sql.select(pet.id, pet.name, pet.companyId, pet.dateOfArrival, pet.ownerId)
             .from(pet)
             .where(pet.type.eq(getPetType(type)))
             .fetch(petWithoutTypeMapper)
@@ -49,8 +49,13 @@ class PetDao @Inject constructor(private val sql: DSLContext) {
             .set(pet.type, petData.type)
             .set(pet.companyId, petData.companyId)
             .set(pet.dateOfArrival, petData.arrivalDate)
-            .onConflict(pet.companyId)
-            .doNothing()
+            .set(pet.ownerId, petData.ownerId)
             .execute()
     }
+
+//    fun getPetByOwner(owner: Owner): List<Pet> =
+//        sql.select(pet.id, pet.name, pet.type, pet.companyId)
+//            .from(pet)
+//            .where(pet.ownerId.eq(owner.id))
+//            .fetch(petMapper)
 }
