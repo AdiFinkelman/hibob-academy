@@ -1,18 +1,13 @@
 package com.hibob.academy.resource
 
-import com.hibob.academy.dao.Example
-import com.hibob.academy.service.ExampleService
+import com.hibob.academy.filters.AuthenticationFilter
 import com.hibob.academy.service.SessionService
-import io.jsonwebtoken.Jwts
 import jakarta.ws.rs.*
-import jakarta.ws.rs.core.Cookie
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.NewCookie
 import jakarta.ws.rs.core.Response
-import org.springframework.stereotype.Component
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestBody
-import java.util.*
 
 @Controller
 @Path("/adi/usersession")
@@ -23,7 +18,7 @@ class UserApi(private val service: SessionService) {
     @Path("/login")
     fun addUser(@RequestBody user: User): Response {
         val token = service.createJwtToken(user)
-        val cookie = NewCookie("JWT", token, "/adi/usersession/login", null, null, 3600, false)
+        val cookie = NewCookie(AuthenticationFilter.AUTH, token, AuthenticationFilter.LOGIN_PATH, null, null, 3600, false)
 
         return Response.ok().cookie(cookie)
             .build()
