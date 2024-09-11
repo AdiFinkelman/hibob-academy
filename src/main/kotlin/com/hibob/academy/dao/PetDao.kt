@@ -16,7 +16,8 @@ class PetDao @Inject constructor(private val sql: DSLContext) {
             name = record[pet.name],
             type = record[pet.type],
             companyId = record[pet.companyId].toLong(),
-            arrivalDate = record[pet.dateOfArrival]
+            arrivalDate = record[pet.dateOfArrival],
+            ownerId = record[pet.ownerId].toLong()
         )
     }
 
@@ -26,7 +27,8 @@ class PetDao @Inject constructor(private val sql: DSLContext) {
             record[pet.id],
             record[pet.name],
             record[pet.companyId].toLong(),
-            record[pet.dateOfArrival]
+            record[pet.dateOfArrival],
+            record[pet.ownerId].toLong()
         )
     }
 
@@ -37,7 +39,7 @@ class PetDao @Inject constructor(private val sql: DSLContext) {
             .fetch(petWithoutTypeMapper)
 
     fun getAllPets(): List<Pet> =
-        sql.select(pet.id, pet.name, pet.type, pet.companyId, pet.dateOfArrival)
+        sql.select(pet.id, pet.name, pet.type, pet.companyId, pet.dateOfArrival, pet.ownerId)
             .from(pet)
             .fetch(petMapper)
 
