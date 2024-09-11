@@ -8,6 +8,7 @@ import org.jooq.RecordMapper
 class PetDao @Inject constructor(private val sql: DSLContext) {
 
     private val pet = PetTable.instance
+    private val owner = OwnerTable.instance
 
     private val petMapper = RecordMapper<Record, Pet>
     { record ->
@@ -46,4 +47,31 @@ class PetDao @Inject constructor(private val sql: DSLContext) {
             .set(pet.ownerId, petData.ownerId)
             .execute()
     }
+
+    fun updatePet(petData: Pet, ownerId: Long) {
+        sql.update(pet)
+            .set(pet.name, petData.name)
+            .set(pet.type, petData.type)
+            .set(pet.companyId, ownerId)
+            .set(pet.dateOfArrival, petData.arrivalDate)
+            .where(pet.ownerId.eq(ownerId))
+            .execute()
+    }
+
+//    Leaved in a comment because there is a problem with the test of this method
+
+//    fun getOwnerByPetId(petData: Pet): Owner? =
+//        sql.select(owner.id, owner.name, owner.employeeId, owner.companyId)
+//            .from(owner)
+//            .where(owner.id.eq(petData.ownerId?.toInt()))
+//            .fetchOne { record ->
+//                Owner(
+//                    id = record[owner.id],
+//                    name = record[owner.name],
+//                    firstName = null,
+//                    lastName = null,
+//                    companyId = record[owner.companyId].toLong(),
+//                    employeeId = record[owner.employeeId]
+//                )
+//            }
 }
