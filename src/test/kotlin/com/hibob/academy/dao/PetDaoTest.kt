@@ -18,7 +18,7 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
     private val petDao = PetDao(sql)
     val table = PetTable.instance
     private val companyId = 1L
-    val pet = Pet(1, "Tom", PetType.CAT.toString(), companyId, Date.valueOf(LocalDate.now()) )
+    val pet = Pet(1, "Tom", PetType.CAT.toString(), companyId, Date.valueOf(LocalDate.now()), 1 )
 
     @Test
     fun `create pet test`() {
