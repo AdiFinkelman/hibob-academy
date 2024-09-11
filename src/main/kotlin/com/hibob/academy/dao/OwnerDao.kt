@@ -12,9 +12,10 @@ class OwnerDao @Inject constructor(private val sql: DSLContext) {
 
     private val ownerMapper = RecordMapper<Record, Owner>
     { record ->
-        val nameParts = record[owner.name]?.split(" ") ?: listOf("")
-        val firstName = nameParts.firstOrNull() ?: ""
-        val lastName = if (nameParts.size > 1) nameParts.drop(1).joinToString(" ") else ""
+        val (firstName, lastName) = record[owner.name]
+            ?.split(" ", limit = 2)
+            ?.let { it.first() to it.getOrNull(1).orEmpty() }
+            ?: ("" to "")
 
         Owner (
             id = record[owner.id],
@@ -26,7 +27,7 @@ class OwnerDao @Inject constructor(private val sql: DSLContext) {
         )
     }
 
-    fun getAllOwners(): List<Owner> =
+    fun getAllOwnersByCompanyId(companyId: Long): List<Owner> =
         sql.select(owner.id, owner.name, owner.employeeId, owner.companyId)
             .from(owner)
             .fetch(ownerMapper)

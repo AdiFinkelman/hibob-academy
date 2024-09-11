@@ -1,6 +1,7 @@
 package com.hibob.academy.dao
 
 import java.sql.Date
+import java.time.LocalDate
 
 data class Example(val id: Long, val companyId: Long, val data: String)
 
@@ -9,15 +10,7 @@ data class Pet(
     val name: String,
     val type: String,
     val companyId: Long,
-    val arrivalDate: Date,
-    val ownerId: Long?
-)
-
-data class PetWithoutType(
-    val id: Int,
-    val name: String,
-    val companyId: Long,
-    val arrivalDate: Date,
+    val arrivalDate: LocalDate,
     val ownerId: Long?
 )
 
