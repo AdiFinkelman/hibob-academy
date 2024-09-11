@@ -21,22 +21,11 @@ class PetDao @Inject constructor(private val sql: DSLContext) {
         )
     }
 
-    private val petWithoutTypeMapper = RecordMapper<Record, PetWithoutType>
-    { record ->
-        PetWithoutType (
-            record[pet.id],
-            record[pet.name],
-            record[pet.companyId].toLong(),
-            record[pet.dateOfArrival],
-            record[pet.ownerId].toLong()
-        )
-    }
-
-    fun getAllPetsByType(type: PetType): List<PetWithoutType> =
-        sql.select(pet.id, pet.name, pet.companyId, pet.dateOfArrival, pet.ownerId)
+    fun getAllPetsByType(type: PetType): List<Pet> =
+        sql.select(pet.id, pet.name, pet.type, pet.companyId, pet.dateOfArrival, pet.ownerId)
             .from(pet)
-            .where(pet.type.eq(getPetType(type)))
-            .fetch(petWithoutTypeMapper)
+            .where(pet.type.eq(type.toString()))
+            .fetch(petMapper)
 
     fun getAllPets(): List<Pet> =
         sql.select(pet.id, pet.name, pet.type, pet.companyId, pet.dateOfArrival, pet.ownerId)
@@ -53,9 +42,9 @@ class PetDao @Inject constructor(private val sql: DSLContext) {
             .execute()
     }
 
-//    fun getPetByOwner(owner: Owner): List<Pet> =
-//        sql.select(pet.id, pet.name, pet.type, pet.companyId)
-//            .from(pet)
-//            .where(pet.ownerId.eq(owner.id))
-//            .fetch(petMapper)
+    fun getPetsByOwner(ownerId: Long): List<Pet> =
+        sql.select(pet.id, pet.name, pet.type, pet.companyId, pet.dateOfArrival, pet.ownerId)
+            .from(pet)
+            .where(pet.ownerId.eq(ownerId))
+            .fetch(petMapper)
 }

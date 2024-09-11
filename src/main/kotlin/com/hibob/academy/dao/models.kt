@@ -13,14 +13,6 @@ data class Pet(
     val ownerId: Long?
 )
 
-data class PetWithoutType(
-    val id: Int,
-    val name: String,
-    val companyId: Long,
-    val arrivalDate: Date,
-    val ownerId: Long?
-)
-
 data class Owner(
     val id: Int,
     val name: String,
