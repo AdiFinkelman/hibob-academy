@@ -12,12 +12,15 @@ import org.apache.http.auth.AUTH
 import org.springframework.stereotype.Component
 import javax.crypto.SecretKey
 
-const val LOGIN_PATH = "adi/usersession/login"
-const val AUTH = "Authorization"
 
 @Component
 @Provider
 class AuthenticationFilter(private val sessionService: SessionService) : ContainerRequestFilter {
+
+    companion object {
+        const val LOGIN_PATH = "adi/usersession/login"
+        const val AUTH = "Authorization"
+    }
 
     override fun filter(requestContext: ContainerRequestContext) {
 
@@ -27,23 +30,20 @@ class AuthenticationFilter(private val sessionService: SessionService) : Contain
         val authCookie = requestContext.cookies[AUTH]?.value?.trim()
         val token = authCookie?.substringAfter("Bearer ")
 
-        if (verify(token) == null) {
+        verify(token, requestContext)
+    }
+
+    fun verify(token: String?, requestContext: ContainerRequestContext) {
+        try {
+            Jwts.parserBuilder()
+                .setSigningKey(sessionService.secretKey)
+                .build()
+        } catch (e: Exception) {
             requestContext.abortWith(
                 Response.status(Response.Status.UNAUTHORIZED)
                     .entity("User cannot access the resource")
                     .build()
             )
-        }
-    }
-
-    fun verify(token: String?): Jws<Claims>? {
-        return try {
-            Jwts.parserBuilder()
-                .setSigningKey(sessionService.secretKey)
-                .build()
-                .parseClaimsJws(token)
-        } catch (e: Exception) {
-            null
         }
     }
 }
