@@ -12,11 +12,15 @@ class OwnerDao @Inject constructor(private val sql: DSLContext) {
 
     private val ownerMapper = RecordMapper<Record, Owner>
     { record ->
+        val nameParts = record[owner.name]?.split(" ") ?: listOf("")
+        val firstName = nameParts.firstOrNull() ?: ""
+        val lastName = if (nameParts.size > 1) nameParts.drop(1).joinToString(" ") else ""
+
         Owner (
             id = record[owner.id],
             name = record[owner.name],
-            firstName = null,
-            lastName = null,
+            firstName = firstName,
+            lastName = lastName,
             companyId = record[owner.companyId].toLong(),
             employeeId = record[owner.employeeId]
         )
