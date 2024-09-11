@@ -44,6 +44,14 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
         assertEquals(companyId, petDao.getAllPets().get(0).companyId)
     }
 
+    @Test
+    fun `count pet by type`() {
+        petDao.createNewPet(pet)
+        val pet1 = Pet(2, "Garfield", PetType.CAT.toString(), companyId, Date.valueOf(LocalDate.now()), 1L)
+        petDao.createNewPet(pet1)
+        assertEquals(mapOf("CAT" to 2), petDao.countPetsByType())
+    }
+
     @BeforeEach
     @AfterEach
     fun cleanup() {

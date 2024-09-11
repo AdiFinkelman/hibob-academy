@@ -4,10 +4,12 @@ import jakarta.inject.Inject
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.RecordMapper
+import org.jooq.impl.DSL
 
 class PetDao @Inject constructor(private val sql: DSLContext) {
 
     private val pet = PetTable.instance
+    private val companyId = 1L
 
     private val petMapper = RecordMapper<Record, Pet>
     { record ->
@@ -47,4 +49,14 @@ class PetDao @Inject constructor(private val sql: DSLContext) {
             .from(pet)
             .where(pet.ownerId.eq(ownerId))
             .fetch(petMapper)
+
+    fun countPetsByType(): Map<String, Int> {
+        return sql.select(pet.type, DSL.count())
+            .from(pet)
+            .groupBy(pet.type)
+            .fetch()
+            .associate { record ->
+                record[pet.type] to record.get(DSL.count())
+            }
+    }
 }
