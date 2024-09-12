@@ -27,15 +27,15 @@ class PetDao @Inject constructor(private val sql: DSLContext) {
             .where(petTable.companyId.eq(companyId))
             .fetch(petMapper)
 
-    fun getAllPetsByType(type: PetType): List<Pet> =
+    fun getAllPetsByType(type: PetType, companyId: Long): List<Pet> =
         sql.select(petTable.id, petTable.name, petTable.type, petTable.companyId, petTable.dateOfArrival, petTable.ownerId)
             .from(petTable)
             .where(petTable.type.eq(type.toString()))
+            .and(petTable.companyId.eq(companyId))
             .fetch(petMapper)
 
-    fun createNewPet(pet: Pet) {
+    fun createNewPet(pet: PetCreationRequest) {
         sql.insertInto(petTable)
-            .set(petTable.id, pet.id)
             .set(petTable.name, pet.name)
             .set(petTable.type, pet.type.toString())
             .set(petTable.companyId, pet.companyId)
@@ -50,6 +50,7 @@ class PetDao @Inject constructor(private val sql: DSLContext) {
         sql.update(petTable)
             .set(petTable.ownerId, ownerId)
             .where(petTable.id.eq(pet.id))
+            .and(petTable.companyId.eq(pet.companyId))
             .execute()
     }
 }

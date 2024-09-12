@@ -13,6 +13,14 @@ data class Pet(
     val ownerId: Long?
 )
 
+data class PetCreationRequest(
+    val name: String,
+    val type: PetType,
+    val companyId: Long,
+    val arrivalDate: LocalDate,
+    val ownerId: Long?
+)
+
 data class Owner(
     val id: Long,
     val name: String,
@@ -22,6 +30,14 @@ data class Owner(
     val employeeId: String
 )
 
-enum class PetType() {
+data class OwnerCreationRequest(
+    val name: String,
+    val firstName: String?,
+    val lastName: String?,
+    val companyId: Long,
+    val employeeId: String
+)
+
+enum class PetType {
     DOG, CAT, BIRD, MOUSE
 }

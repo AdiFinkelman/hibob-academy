@@ -14,17 +14,19 @@ import java.time.LocalDate
 class OwnerDaoTest @Autowired constructor(private val sql: DSLContext) {
 
     private val ownerDao = OwnerDao(sql)
-    val table = OwnerTable.instance
+    val ownerTable = OwnerTable.instance
+    val petTable = PetTable.instance
+    val petDao = PetDao(sql)
     private val companyId = 1L
-    val owner1 = Owner(1L,"Adi Finkelman", "Adi", "Finkelman", companyId, "2")
-    val owner2 = Owner(2L,"Dolev Finkelman", "Dolev", "Finkelman", companyId, "3")
+    val owner1 = OwnerCreationRequest("Adi Finkelman", "Adi", "Finkelman", companyId, "2")
+    val owner2 = OwnerCreationRequest("Dolev Finkelman", "Dolev", "Finkelman", companyId, "3")
 
     @Test
     fun `create owner test`() {
-        val expectedResult = listOf(owner1, owner2)
+        val expectedResult = listOf(owner1, owner2).map { it.name }
         ownerDao.createNewOwner(owner1)
         ownerDao.createNewOwner(owner2)
-        assertEquals(expectedResult, ownerDao.getAllOwnersByCompanyId(companyId))
+        assertEquals(expectedResult, ownerDao.getAllOwnersByCompanyId(companyId).map { it.name })
     }
 
     @Test
@@ -35,7 +37,7 @@ class OwnerDaoTest @Autowired constructor(private val sql: DSLContext) {
 
     @Test
     fun `create owner without first name and last name`() {
-        val owner3 = Owner(3, "Ori Finkelman", null, null, companyId, "1")
+        val owner3 = OwnerCreationRequest("Ori Finkelman", null, null, companyId, "1")
         ownerDao.createNewOwner(owner3)
         assertEquals("Ori", ownerDao.getAllOwnersByCompanyId(companyId)[0].firstName)
         assertEquals("Finkelman", ownerDao.getAllOwnersByCompanyId(companyId)[0].lastName)
@@ -45,69 +47,60 @@ class OwnerDaoTest @Autowired constructor(private val sql: DSLContext) {
     fun `create duplicate owner`() {
         ownerDao.createNewOwner(owner1)
         ownerDao.createNewOwner(owner1)
-        val expectedResult = listOf(owner1)
-        assertEquals(expectedResult, ownerDao.getAllOwnersByCompanyId(companyId))
+        val expectedResult = listOf(owner1).map { it.name }
+        assertEquals(expectedResult, ownerDao.getAllOwnersByCompanyId(companyId).map { it.name })
     }
 
     @Test
     fun `create multiple owner with same companyId and different employeeId`() {
         ownerDao.createNewOwner(owner1)
-        val owner = Owner(3L, "Ori Finkelman", "Ori", "Finkelman", companyId, "1")
+        val owner = OwnerCreationRequest("Ori Finkelman", "Ori", "Finkelman", companyId, "1")
         ownerDao.createNewOwner(owner)
-        val expectedResult = listOf(owner1, owner)
-        assertEquals(expectedResult, ownerDao.getAllOwnersByCompanyId(companyId))
+        val expectedResult = listOf(owner1, owner).map { it.name }
+        assertEquals(expectedResult, ownerDao.getAllOwnersByCompanyId(companyId).map { it.name })
     }
 
     @Test
     fun `create multiple owner with same employeeId and same companyId`() {
         ownerDao.createNewOwner(owner1)
-        val owner = Owner(3L, "Ori Finkelman", "Ori", "Finkelman", companyId, "2")
+        val owner = OwnerCreationRequest("Ori Finkelman", "Ori", "Finkelman", companyId, "2")
         ownerDao.createNewOwner(owner)
-        val expectedResult = listOf(owner1)
-        assertEquals(expectedResult, ownerDao.getAllOwnersByCompanyId(companyId))
+        val expectedResult = listOf(owner1).map { it.name }
+        assertEquals(expectedResult, ownerDao.getAllOwnersByCompanyId(companyId).map { it.name })
     }
 
     @Test
     fun `get owner by pet id`() {
-        val pet = Pet(3L, "Rockey", PetType.DOG, 1L, LocalDate.now(), owner1.id)
-
-        val petTable = PetTable.instance
         ownerDao.createNewOwner(owner1)
-        val petDao = PetDao(sql)
-        petDao.createNewPet(pet)
+        val ownerId = ownerDao.getAllOwnersByCompanyId(companyId).get(0).id
+        val petCreationRequest = PetCreationRequest("Rockey", PetType.DOG, 1L, LocalDate.now(), ownerId)
+        petDao.createNewPet(petCreationRequest)
+        val petId = petDao.getAllPetsByCompanyId(companyId).get(0).id
 
-        val fetchedOwner = ownerDao.getOwnerByPetId(pet.id)
+        val fetchedOwner = ownerDao.getOwnerByPetId(petId, companyId)
+        val expectedOwner = Owner(ownerId, owner1.name, owner1.firstName, owner1.lastName, owner1.companyId, owner1.employeeId)
 
-        assertNotNull(fetchedOwner)
-        assertEquals(owner1.name, fetchedOwner?.name)
-        assertEquals(owner1.employeeId, fetchedOwner?.employeeId)
-        assertEquals(owner1.companyId, fetchedOwner?.companyId)
-
-        //clean pet table
-        sql.deleteFrom(petTable)
-            .where(petTable.companyId.eq(companyId))
-            .execute()
+        assertEquals(expectedOwner, fetchedOwner)
     }
 
     @Test
     fun `get null owner by pet id when owner id null`() {
-        val pet = Pet(3L, "Rockey", PetType.DOG, 1L, LocalDate.now(), null)
+        val petCreationRequest = PetCreationRequest("Rockey", PetType.DOG, 1L, LocalDate.now(), null)
+        petDao.createNewPet(petCreationRequest)
+        val petId = petDao.getAllPetsByCompanyId(companyId).get(0).id
 
-        val petDao = PetDao(sql)
-        petDao.createNewPet(pet)
-
-        assertNull(ownerDao.getOwnerByPetId(pet.id))
-
-        //clean pet table
-        val petTable = PetTable.instance
-        sql.deleteFrom(petTable)
-            .execute()
+        assertNull(ownerDao.getOwnerByPetId(petId, companyId))
     }
 
     @BeforeEach
     @AfterEach
     fun cleanup() {
-        sql.deleteFrom(table)
+        sql.deleteFrom(ownerTable)
+            .where(ownerTable.companyId.eq(companyId))
+            .execute()
+
+        sql.deleteFrom(petTable)
+            .where(petTable.companyId.eq(companyId))
             .execute()
     }
 }

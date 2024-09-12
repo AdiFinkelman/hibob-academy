@@ -31,9 +31,8 @@ class OwnerDao @Inject constructor(private val sql: DSLContext) {
             .where(ownerTable.companyId.eq(companyId))
             .fetch(ownerMapper)
 
-    fun createNewOwner(owner: Owner) {
+    fun createNewOwner(owner: OwnerCreationRequest) {
         sql.insertInto(ownerTable)
-            .set(ownerTable.id, owner.id)
             .set(ownerTable.name, owner.name)
             .set(ownerTable.companyId, owner.companyId)
             .set(ownerTable.employeeId, owner.employeeId)
@@ -41,6 +40,13 @@ class OwnerDao @Inject constructor(private val sql: DSLContext) {
             .doNothing()
             .execute()
     }
+
+        fun getOwnerByPetId(petId: Long, companyId: Long): Owner? =
+            sql.select(ownerTable.id, ownerTable.name, ownerTable.employeeId, ownerTable.companyId)
+                .from(ownerTable).rightJoin(petTable).on(ownerTable.id.eq(petTable.ownerId))
+                .where(petTable.id.eq(petId))
+                .and(petTable.companyId.eq(companyId))
+                .fetchOne(ownerMapper)
 
     private fun splitNameToFirstAndLastName(fullName: String): Pair<String, String> {
         val parts = fullName.trim().split("\\s+".toRegex())
@@ -51,11 +57,4 @@ class OwnerDao @Inject constructor(private val sql: DSLContext) {
             else -> Pair("", "")
         }
     }
-
-        fun getOwnerByPetId(petId: Long): Owner? =
-            sql.select(ownerTable.id, ownerTable.name, ownerTable.employeeId, ownerTable.companyId)
-                .from(ownerTable).rightJoin(petTable).on(ownerTable.id.eq(petTable.ownerId))
-                .where(petTable.id.eq(petId))
-                .and(petTable.companyId.eq(ownerTable.companyId))
-                .fetchOne(ownerMapper)
 }
