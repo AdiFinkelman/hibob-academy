@@ -1,19 +1,27 @@
 package com.hibob.academy.dao
 
 import com.hibob.academy.utils.JooqTable
-import javassist.CtMethod.ConstParameter.integer
 
-class petTable(tableName: String = "pet") : JooqTable(tableName) {
-    val id = createIntField("id")
+class PetTable(tableName: String = "pet") : JooqTable(tableName) {
+    val id = createBigIntField("id")
     val name = createVarcharField("name")
     val type = createVarcharField("type")
-    val company_id = createBigIntField("company_id")
-    val date_of_arrival = createDateField("date_of_arrival")
+    val companyId = createBigIntField("company_id")
+    val dateOfArrival = createLocalDateField("date_of_arrival")
+    val ownerId = createBigIntField("owner_id")
+
+    companion object {
+        val instance = PetTable()
+    }
 }
 
-class ownerTable(tableName: String = "owner") : JooqTable(tableName) {
-    val id = createIntField("id")
+class OwnerTable(tableName: String = "owner") : JooqTable(tableName) {
+    val id = createBigIntField("id")
     val name = createVarcharField("name")
-    val company_id = createBigIntField("company_id")
-    val employee_id = createVarcharField("employee_id")
+    val companyId = createBigIntField("company_id")
+    val employeeId = createVarcharField("employee_id")
+
+    companion object {
+        val instance = OwnerTable()
+    }
 }
