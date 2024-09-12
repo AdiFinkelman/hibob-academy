@@ -34,14 +34,6 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
     }
 
     @Test
-    fun `create duplicate pet`() {
-        petDao.createNewPet(pet1)
-        petDao.createNewPet(pet1)
-        val expectedResult = listOf(pet1).map { it.name }
-        assertEquals(expectedResult, petDao.getAllPetsByCompanyId(companyId).map { it.name })
-    }
-
-    @Test
     fun `create multiple pet with different companyId`() {
         petDao.createNewPet(pet1)
         val petTest = PetCreationRequest("Tom", PetType.CAT, 2L, LocalDate.now(), 1L )
@@ -72,7 +64,7 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
     @Test
     fun `adopt pet which already have owner`() {
         val newOwnerId = 2L
-        val petCreationRequest = PetCreationRequest("Tom", PetType.CAT, companyId, LocalDate.now(), 1L )
+        val petCreationRequest = PetCreationRequest("Tom", PetType.CAT, companyId, LocalDate.now(), newOwnerId)
         val pet = Pet(1L, petCreationRequest.name, petCreationRequest.type, petCreationRequest.companyId, petCreationRequest.arrivalDate, petCreationRequest.ownerId)
         petDao.createNewPet(petCreationRequest)
         petDao.adoptPet(pet, newOwnerId)

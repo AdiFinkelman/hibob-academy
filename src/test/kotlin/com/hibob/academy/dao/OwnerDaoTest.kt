@@ -85,9 +85,9 @@ class OwnerDaoTest @Autowired constructor(private val sql: DSLContext) {
 
     @Test
     fun `get null owner by pet id when owner id null`() {
-        val petCreationRequest = PetCreationRequest("Rockey", PetType.DOG, 1L, LocalDate.now(), null)
+        val petCreationRequest = PetCreationRequest("Rockey", PetType.DOG, companyId, LocalDate.now(), null)
         petDao.createNewPet(petCreationRequest)
-        val petId = petDao.getAllPetsByCompanyId(companyId).get(0).id
+        val petId = petDao.getAllPetsByCompanyId(companyId)[0].id
 
         assertNull(ownerDao.getOwnerByPetId(petId, companyId))
     }

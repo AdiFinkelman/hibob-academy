@@ -41,8 +41,6 @@ class PetDao @Inject constructor(private val sql: DSLContext) {
             .set(petTable.companyId, pet.companyId)
             .set(petTable.dateOfArrival, pet.arrivalDate)
             .set(petTable.ownerId, pet.ownerId)
-            .onConflict(petTable.id)
-            .doNothing()
             .execute()
     }
 
