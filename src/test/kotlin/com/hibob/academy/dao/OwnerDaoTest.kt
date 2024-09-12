@@ -20,8 +20,25 @@ class OwnerDaoTest @Autowired constructor(private val sql: DSLContext) {
     @Test
     fun `create owner test`() {
         ownerDao.createNewOwner(owner)
-        assertEquals("Adi Finkelman" ,ownerDao.getAllOwnersByCompanyId(companyId).get(0).name)
-        assertEquals("2", ownerDao.getAllOwnersByCompanyId(companyId).get(0).employeeId)
+        assertEquals("Adi Finkelman" ,ownerDao.getAllOwnersByCompanyId(companyId)[0].name)
+        assertEquals("2", ownerDao.getAllOwnersByCompanyId(companyId)[0].employeeId)
+    }
+
+    @Test
+    fun `test name split`() {
+        ownerDao.createNewOwner(owner)
+        ownerDao.splitNameToFirstAndLastName(owner.name)
+        assertEquals("Adi", ownerDao.getAllOwnersByCompanyId(companyId)[0].firstName)
+        assertEquals("Finkelman", ownerDao.getAllOwnersByCompanyId(companyId)[0].lastName)
+    }
+
+    @Test
+    fun `test null name split`() {
+        val ownerWithNullName = Owner(2, "", null, null, 1L, "3")
+        ownerDao.createNewOwner(ownerWithNullName)
+        ownerDao.splitNameToFirstAndLastName(ownerWithNullName.name)
+        assertEquals("", ownerDao.getAllOwnersByCompanyId(companyId)[0].firstName)
+        assertEquals("", ownerDao.getAllOwnersByCompanyId(companyId)[0].lastName)
     }
 
     @BeforeEach

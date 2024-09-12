@@ -6,7 +6,7 @@ import java.time.LocalDate
 data class Example(val id: Long, val companyId: Long, val data: String)
 
 data class Pet(
-    val id: Int,
+    val id: Long,
     val name: String,
     val type: String,
     val companyId: Long,
@@ -15,7 +15,7 @@ data class Pet(
 )
 
 data class Owner(
-    val id: Int,
+    val id: Long,
     val name: String,
     val firstName: String?,
     val lastName: String?,

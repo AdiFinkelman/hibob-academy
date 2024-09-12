@@ -25,17 +25,17 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
     @Test
     fun `create pet and get all pets`() {
         petDao.createNewPet(pet)
-        assertEquals("Tom" ,petDao.getAllPetsByCompanyId(companyId).get(0).name)
-        assertEquals(companyId, petDao.getAllPetsByCompanyId(companyId).get(0).companyId)
-        assertEquals(PetType.CAT.toString(), petDao.getAllPetsByCompanyId(companyId).get(0).type)
+        assertEquals("Tom" , petDao.getAllPetsByCompanyId(companyId)[0].name)
+        assertEquals(companyId, petDao.getAllPetsByCompanyId(companyId)[0].companyId)
+        assertEquals(PetType.CAT.toString(), petDao.getAllPetsByCompanyId(companyId)[0].type)
     }
 
     @Test
-    fun `get all pets without type by type`() {
+    fun `get all pets by type`() {
         petDao.createNewPet(pet)
-        assertEquals("Tom" ,petDao.getAllPetsByType(PetType.CAT).get(0).name)
-        assertEquals(companyId, petDao.getAllPetsByType(PetType.CAT).get(0).companyId)
-        assertEquals(PetType.CAT.toString(), petDao.getAllPetsByType(PetType.CAT).get(0).type)
+        assertEquals("Tom" ,petDao.getAllPetsByType(PetType.CAT)[0].name)
+        assertEquals(companyId, petDao.getAllPetsByType(PetType.CAT)[0].companyId)
+        assertEquals(PetType.CAT.toString(), petDao.getAllPetsByType(PetType.CAT)[0].type)
     }
 
     @Test
