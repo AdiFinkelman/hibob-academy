@@ -8,40 +8,41 @@ import org.jooq.RecordMapper
 
 class OwnerDao @Inject constructor(private val sql: DSLContext) {
 
-    private val owner = OwnerTable.instance
-    private val pet = PetTable.instance
+    private val ownerTable = OwnerTable.instance
+    private val petTable = PetTable.instance
 
     private val ownerMapper = RecordMapper<Record, Owner>
     { record ->
-        val (firstName, lastName) = splitNameToFirstAndLastName(record[owner.name])
+        val (firstName, lastName) = splitNameToFirstAndLastName(record[ownerTable.name])
 
         Owner (
-            id = record[owner.id].toLong(),
-            name = record[owner.name],
+            id = record[ownerTable.id],
+            name = record[ownerTable.name],
             firstName = firstName,
             lastName = lastName,
-            companyId = record[owner.companyId].toLong(),
-            employeeId = record[owner.employeeId]
+            companyId = record[ownerTable.companyId],
+            employeeId = record[ownerTable.employeeId]
         )
     }
 
     fun getAllOwnersByCompanyId(companyId: Long): List<Owner> =
-        sql.select(owner.id, owner.name, owner.employeeId, owner.companyId)
-            .from(owner)
-            .where(owner.companyId.eq(companyId))
+        sql.select(ownerTable.id, ownerTable.name, ownerTable.employeeId, ownerTable.companyId)
+            .from(ownerTable)
+            .where(ownerTable.companyId.eq(companyId))
             .fetch(ownerMapper)
 
-    fun createNewOwner(ownerData: Owner) {
-        sql.insertInto(owner)
-            .set(owner.name, ownerData.name)
-            .set(owner.companyId, ownerData.companyId)
-            .set(owner.employeeId, ownerData.employeeId)
-            .onConflict(owner.companyId, owner.employeeId)
+    fun createNewOwner(owner: Owner) {
+        sql.insertInto(ownerTable)
+            .set(ownerTable.id, owner.id)
+            .set(ownerTable.name, owner.name)
+            .set(ownerTable.companyId, owner.companyId)
+            .set(ownerTable.employeeId, owner.employeeId)
+            .onConflict(ownerTable.companyId, ownerTable.employeeId)
             .doNothing()
             .execute()
     }
 
-    fun splitNameToFirstAndLastName(fullName: String): Pair<String, String> {
+    private fun splitNameToFirstAndLastName(fullName: String): Pair<String, String> {
         val parts = fullName.trim().split("\\s+".toRegex())
 
         return when {
@@ -51,20 +52,10 @@ class OwnerDao @Inject constructor(private val sql: DSLContext) {
         }
     }
 
-    //    Leaved in a comment because there is a problem with the test of this method
-
-//    fun getOwnerByPetId(petData: Pet): Owner? =
-//        sql.select(owner.id, owner.name, owner.employeeId, owner.companyId)
-//            .from(owner)
-//            .where(owner.id.eq(petData.ownerId?.toInt()))
-//            .fetchOne { record ->
-//                Owner(
-//                    id = record[owner.id],
-//                    name = record[owner.name],
-//                    firstName = null,
-//                    lastName = null,
-//                    companyId = record[owner.companyId].toLong(),
-//                    employeeId = record[owner.employeeId]
-//                )
-//            }
+        fun getOwnerByPetId(petId: Long): Owner? =
+            sql.select(ownerTable.id, ownerTable.name, ownerTable.employeeId, ownerTable.companyId)
+                .from(ownerTable).rightJoin(petTable).on(ownerTable.id.eq(petTable.ownerId))
+                .where(petTable.id.eq(petId))
+                .and(petTable.companyId.eq(ownerTable.companyId))
+                .fetchOne(ownerMapper)
 }

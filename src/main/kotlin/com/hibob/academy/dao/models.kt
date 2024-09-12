@@ -1,6 +1,5 @@
 package com.hibob.academy.dao
 
-import java.sql.Date
 import java.time.LocalDate
 
 data class Example(val id: Long, val companyId: Long, val data: String)
@@ -8,7 +7,7 @@ data class Example(val id: Long, val companyId: Long, val data: String)
 data class Pet(
     val id: Long,
     val name: String,
-    val type: String,
+    val type: PetType,
     val companyId: Long,
     val arrivalDate: LocalDate,
     val ownerId: Long?
@@ -26,11 +25,3 @@ data class Owner(
 enum class PetType() {
     DOG, CAT, BIRD, MOUSE
 }
-
-fun getPetType(petType: PetType) =
-    when (petType) {
-        PetType.DOG -> "Dog"
-        PetType.CAT -> "Cat"
-        PetType.BIRD -> "Bird"
-        PetType.MOUSE -> "Mouse"
-    }
