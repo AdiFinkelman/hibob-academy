@@ -1,13 +1,14 @@
 CREATE TABLE pet
 (
-    id SERIAL PRIMARY KEY,
+    id BIGINT PRIMARY KEY,
     name varchar(64) NOT NULL,
     type varchar(64) NOT NULL,
     company_id BIGINT NOT NULL,
-    date_of_arrival DATE DEFAULT CURRENT_DATE
+    date_of_arrival DATE DEFAULT CURRENT_DATE,
+    owner_id BIGINT
 );
 
-CREATE INDEX idx_pets_company_id ON pets(company_id);
+CREATE INDEX idx_pets_company_id ON pet(company_id);
 
 -- INSERT INTO pets(name, type, company_id, date_of_arrival)
 -- VALUES ('Tom', 'Cat', 1, '2024-09-08');
