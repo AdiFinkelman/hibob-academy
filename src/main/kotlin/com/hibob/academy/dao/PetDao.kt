@@ -1,8 +1,10 @@
 package com.hibob.academy.dao
 
+import jakarta.inject.Inject
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.RecordMapper
+import org.jooq.impl.DSL
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -53,5 +55,22 @@ class PetDao @Autowired constructor(private val sql: DSLContext) {
             .where(petTable.id.eq(pet.id))
             .and(petTable.companyId.eq(pet.companyId))
             .execute()
+    }
+
+    //sql 2
+    fun getPetsByOwner(ownerId: Long): List<Pet> =
+        sql.select(petTable.id, petTable.name, petTable.type, petTable.companyId, petTable.dateOfArrival, petTable.ownerId)
+            .from(petTable)
+            .where(petTable.ownerId.eq(ownerId))
+            .fetch(petMapper)
+
+    fun countPetsByType(): Map<String, Int> {
+        return sql.select(petTable.type, DSL.count())
+            .from(petTable)
+            .groupBy(petTable.type)
+            .fetch()
+            .associate { record ->
+                record[petTable.type] to record.get(DSL.count())
+            }
     }
 }
