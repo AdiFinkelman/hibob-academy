@@ -97,7 +97,7 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
         petDao.createNewPet(petCreationRequest1)
         petDao.createNewPet(petCreationRequest2)
         val expectedResult = listOf(petCreationRequest1, petCreationRequest2).map { it.name }
-        assertEquals(expectedResult, petDao.getPetsByOwner(ownerId).map { it.name })
+        assertEquals(expectedResult, petDao.getPetsByOwner(ownerId, companyId).map { it.name })
     }
 
     @Test
@@ -106,7 +106,7 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
         petDao.createNewPet(pet1)
         petDao.createNewPet(pet2)
         val expectedResult = listOf(pet2).map { it.name }
-        assertEquals(expectedResult, petDao.getPetsByOwner(ownerId).map { it.name })
+        assertEquals(expectedResult, petDao.getPetsByOwner(ownerId, companyId).map { it.name })
     }
 
     @Test
