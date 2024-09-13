@@ -88,6 +88,43 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
         assertEquals(newOwnerId, petDao.getAllPetsByCompanyId(companyId)[0].ownerId)
     }
 
+    //sql 2 tests
+    @Test
+    fun `get pets by owner`() {
+        val ownerId = 2L
+        val petCreationRequest1 = PetCreationRequest("Tom", PetType.CAT, companyId, LocalDate.now(), ownerId)
+        val petCreationRequest2 = PetCreationRequest("Luke", PetType.DOG, companyId, LocalDate.now(), ownerId)
+        petDao.createNewPet(petCreationRequest1)
+        petDao.createNewPet(petCreationRequest2)
+        val expectedResult = listOf(petCreationRequest1, petCreationRequest2).map { it.name }
+        assertEquals(expectedResult, petDao.getPetsByOwner(ownerId).map { it.name })
+    }
+
+    @Test
+    fun `get pets by owner when owner id are different`() {
+        val ownerId = 2L
+        petDao.createNewPet(pet1)
+        petDao.createNewPet(pet2)
+        val expectedResult = listOf(pet2).map { it.name }
+        assertEquals(expectedResult, petDao.getPetsByOwner(ownerId).map { it.name })
+    }
+
+    @Test
+    fun `count pets by type`() {
+        petDao.createNewPet(pet1)
+        petDao.createNewPet(pet2)
+        val petCreationRequest = PetCreationRequest("Nico", PetType.DOG, companyId, LocalDate.now(), 1L )
+        petDao.createNewPet(petCreationRequest)
+        val expectedResult = mapOf(PetType.CAT.toString() to 1, PetType.DOG.toString() to 2)
+        assertEquals(expectedResult, petDao.countPetsByType())
+    }
+
+    @Test
+    fun `count pets by type for empty list`() {
+        val expectedResult = emptyMap<String, Int>()
+        assertEquals(expectedResult, petDao.countPetsByType())
+    }
+
     @BeforeEach
     @AfterEach
     fun cleanup() {
