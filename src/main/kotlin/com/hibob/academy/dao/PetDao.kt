@@ -58,19 +58,17 @@ class PetDao @Autowired constructor(private val sql: DSLContext) {
     }
 
     //sql 2
-    fun getPetsByOwner(ownerId: Long): List<Pet> =
+    fun getPetsByOwner(ownerId: Long, companyId: Long): List<Pet> =
         sql.select(petTable.id, petTable.name, petTable.type, petTable.companyId, petTable.dateOfArrival, petTable.ownerId)
             .from(petTable)
             .where(petTable.ownerId.eq(ownerId))
+            .and(petTable.companyId.eq(companyId))
             .fetch(petMapper)
 
     fun countPetsByType(): Map<String, Int> {
         return sql.select(petTable.type, DSL.count())
             .from(petTable)
             .groupBy(petTable.type)
-            .fetch()
-            .associate { record ->
-                record[petTable.type] to record.get(DSL.count())
-            }
+            .fetchMap(petTable.type, DSL.count())
     }
 }
