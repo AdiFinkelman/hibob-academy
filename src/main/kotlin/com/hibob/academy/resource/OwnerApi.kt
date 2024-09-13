@@ -11,13 +11,13 @@ import java.util.concurrent.CopyOnWriteArrayList
 @Path("/api/adi/owners")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-class OwnerResource {
+class OwnerResource() {
 
     private val allOwners: MutableList<Owner> = CopyOnWriteArrayList()
 
     @GET
     @Path("/{ownerId}")
-    fun getOwnerById(@PathParam("ownerId") ownerId: Long): Response {
+    fun getOwnerById(@PathParam("ownerId") ownerId: Long?): Response {
         val owner = allOwners.find { it.id == ownerId }
         return owner?.let {
             Response.ok(owner).build()
