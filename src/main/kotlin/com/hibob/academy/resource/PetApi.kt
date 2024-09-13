@@ -5,7 +5,6 @@ import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.springframework.stereotype.Controller
-import java.sql.Date
 import java.time.LocalDate
 import java.util.concurrent.CopyOnWriteArrayList
 
@@ -22,11 +21,11 @@ class PetsResource {
     fun getPetById(@PathParam("petId") petId: Long): Response {
         val pet = allPets.find { it.id == petId }
         return pet?.let {
-            Response.ok(pet).build()
-        }
-            ?: Response.status(Response.Status.NOT_FOUND)
-                .entity("Pet not found")
+            Response.ok()
+                .entity(pet)
                 .build()
+        }
+            ?: throw NotFoundException("Pet not found")
     }
 
     @GET
@@ -40,7 +39,7 @@ class PetsResource {
         val newPet = pet.copy(id = newPetId, arrivalDate = LocalDate.now())
         allPets.add(newPet)
 
-        return Response.status(Response.Status.CREATED)
+        return Response.ok()
             .entity(newPet)
             .build()
     }
@@ -52,14 +51,12 @@ class PetsResource {
         return if (index != -1) {
             val petToUpdate = updatedPet.copy(id = petId)
             allPets[index] = petToUpdate
-            Response.status(Response.Status.ACCEPTED)
+            Response.ok()
                 .entity(petToUpdate)
                 .build()
         }
         else {
-            Response.status(Response.Status.NOT_FOUND)
-                .entity("Pet not found")
-                .build()
+            throw NotFoundException("Pet not found")
         }
     }
 
@@ -68,10 +65,8 @@ class PetsResource {
     fun deletePet(@PathParam("petId") petId: Long): Response {
         val removedPet = allPets.removeIf { it.id == petId }
         return removedPet.let {
-            Response.status(Response.Status.NO_CONTENT).build()
+            Response.ok().build()
         }
-            ?: Response.status(Response.Status.NOT_FOUND)
-                .entity("Pet not found")
-                .build()
+            ?: throw NotFoundException("Pet not found")
     }
 }

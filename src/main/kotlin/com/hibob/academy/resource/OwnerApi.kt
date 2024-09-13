@@ -21,9 +21,7 @@ class OwnerResource {
         val owner = allOwners.find { it.id == ownerId }
         return owner?.let {
             Response.ok(owner).build()
-        } ?: Response.status(Response.Status.NOT_FOUND)
-            .entity("Owner not found")
-            .build()
+        } ?: throw NotFoundException("Owner not found")
     }
 
     @GET
@@ -34,18 +32,11 @@ class OwnerResource {
     @POST
     fun addOwner(owner: Owner): Response {
         val newOwnerId = (allOwners.maxOfOrNull { it.id } ?: 0) + 1
-
-        val badRequest = Response.status(Response.Status.BAD_REQUEST)
-
-        val firstName = owner.name?.split(" ")?.first()
-            ?: owner.firstName ?: return badRequest.entity("Missing first name").build()
-        val lastName = owner.name?.split(" ")?.drop(1)?.joinToString(" ")?.takeIf { it.isNotBlank() }
-            ?: owner.lastName ?: return badRequest.entity("Missing last name").build()
-
+        val (firstName, lastName) = extractFirstAndLastName(owner)
         val newOwner = owner.copy(id = newOwnerId, name = "$firstName $lastName", firstName = firstName, lastName = lastName)
         allOwners.add(newOwner)
 
-        return Response.status(Response.Status.CREATED)
+        return Response.ok()
             .entity(allOwners)
             .build()
     }
@@ -55,19 +46,15 @@ class OwnerResource {
     fun updateOwner(@PathParam("ownerId") ownerId: Long, updatedOwner: Owner): Response {
         val index = allOwners.indexOfFirst { it.id == ownerId }
         return if (index != -1) {
-            val badRequest = Response.status(Response.Status.BAD_REQUEST).build()
-            val firstName = updatedOwner.name?.split(" ")?.first() ?: updatedOwner.firstName ?: return badRequest
-            val lastName = updatedOwner.name?.split(" ")?.last() ?: updatedOwner.lastName ?: return badRequest
+            val (firstName, lastName) = updateFirstAndLastName(updatedOwner)
 
             val ownerToUpdate = updatedOwner.copy(id = ownerId, name = "$firstName $lastName", lastName = lastName)
             allOwners[index] = ownerToUpdate
-            Response.status(Response.Status.ACCEPTED)
+            Response.ok()
                 .entity(ownerToUpdate)
                 .build()
         } else {
-            Response.status(Response.Status.NOT_FOUND)
-                .entity("Owner not found")
-                .build()
+            throw NotFoundException("Owner not found")
         }
     }
 
@@ -78,9 +65,22 @@ class OwnerResource {
         return removedOwner.let {
             Response.status(Response.Status.NO_CONTENT).build()
         }
-            ?: Response.status(Response.Status.NOT_FOUND)
-                .entity("Owner not found")
-                .build()
+            ?: throw NotFoundException("Owner not found")
+    }
+
+    private fun extractFirstAndLastName(owner: Owner): Pair<String?, String?> {
+        val firstName = owner.name.split(" ").first()
+        val lastName = owner.name.split(" ").drop(1).joinToString(" ").takeIf { it.isNotBlank() }
+            ?: owner.lastName ?: throw BadRequestException("Last name is required")
+
+        return Pair(firstName, lastName)
+    }
+
+    private fun updateFirstAndLastName(updatedOwner: Owner): Pair<String?, String?>  {
+        val firstName = updatedOwner.name.split(" ").firstOrNull() ?: updatedOwner.firstName ?: throw BadRequestException("First name not found")
+        val lastName = updatedOwner.name.split(" ").drop(1).joinToString(" ").takeIf { it.isNotBlank() } ?: updatedOwner.lastName ?: throw BadRequestException("Last name not found")
+
+        return Pair(firstName, lastName)
     }
 
 }
