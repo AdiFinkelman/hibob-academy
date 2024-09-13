@@ -1,5 +1,7 @@
 package com.hibob.academy.resource
 
+import com.hibob.academy.dao.AdoptionRequest
+import com.hibob.academy.dao.Owner
 import com.hibob.academy.dao.Pet
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
@@ -12,9 +14,10 @@ import java.util.concurrent.CopyOnWriteArrayList
 @Path("/api/adi/pets")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-class PetsResource {
+class PetsResource(private val ownerResource: OwnerResource) {
 
     private val allPets: MutableList<Pet> = CopyOnWriteArrayList()
+    private val allOwners: MutableList<Owner> = CopyOnWriteArrayList()
 
     @GET
     @Path("/{petId}")
@@ -31,6 +34,18 @@ class PetsResource {
     @GET
     fun getAllPets(): Response {
         return Response.ok(allPets).build()
+    }
+
+    @GET
+    @Path("/{petId}/owner")
+    fun getOwnerByPetId(@PathParam("petId") petId: Long): Response {
+        val pet = allPets.find { it.id == petId } ?: throw NotFoundException("Pet not found")
+        val ownerResponse = ownerResource.getOwnerById(pet.ownerId)
+        val owner = ownerResponse.entity as? Owner ?: throw NotFoundException("Owner not found")
+
+        return Response.ok()
+            .entity(owner)
+            .build()
     }
 
     @POST
@@ -54,8 +69,23 @@ class PetsResource {
             Response.ok()
                 .entity(petToUpdate)
                 .build()
+        } else {
+            throw NotFoundException("Pet not found")
         }
-        else {
+    }
+
+    @PUT
+    @Path("/{petId}/adopt")
+    @Consumes(MediaType.APPLICATION_JSON)
+    fun adoptPet(@PathParam("petId") petId: Long, request: AdoptionRequest): Response {
+        val index = allPets.indexOfFirst { it.id == petId }
+        return if (index != -1) {
+            val petToUpdate = allPets[index].copy(ownerId = request.ownerId)
+            allPets[index] = petToUpdate
+            Response.ok()
+                .entity(petToUpdate)
+                .build()
+        } else {
             throw NotFoundException("Pet not found")
         }
     }
