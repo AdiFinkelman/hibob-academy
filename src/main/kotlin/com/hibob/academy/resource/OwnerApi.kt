@@ -18,7 +18,7 @@ class OwnerResource {
     @GET
     @Path("/{ownerId}")
     fun getOwnerById(@PathParam("ownerId") ownerId: Long): Response {
-        val owner = allOwners.find { it.id == ownerId.toInt() }
+        val owner = allOwners.find { it.id == ownerId }
         return owner?.let {
             Response.ok(owner).build()
         } ?: Response.status(Response.Status.NOT_FOUND)
@@ -52,7 +52,7 @@ class OwnerResource {
 
     @PUT
     @Path("/{ownerId}")
-    fun updateOwner(@PathParam("ownerId") ownerId: Int, updatedOwner: Owner): Response {
+    fun updateOwner(@PathParam("ownerId") ownerId: Long, updatedOwner: Owner): Response {
         val index = allOwners.indexOfFirst { it.id == ownerId }
         return if (index != -1) {
             val badRequest = Response.status(Response.Status.BAD_REQUEST).build()
@@ -73,7 +73,7 @@ class OwnerResource {
 
     @DELETE
     @Path("/{ownerId}")
-    fun deleteOwner(@PathParam("ownerId") ownerId: Int): Response {
+    fun deleteOwner(@PathParam("ownerId") ownerId: Long): Response {
         val removedOwner = allOwners.removeIf { it.id == ownerId }
         return removedOwner.let {
             Response.status(Response.Status.NO_CONTENT).build()
