@@ -1,12 +1,14 @@
 package com.hibob.academy.dao
 
 
-import jakarta.inject.Inject
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.RecordMapper
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Component
 
-class OwnerDao @Inject constructor(private val sql: DSLContext) {
+@Component
+class OwnerDao @Autowired constructor(private val sql: DSLContext) {
 
     private val ownerTable = OwnerTable.instance
     private val petTable = PetTable.instance
