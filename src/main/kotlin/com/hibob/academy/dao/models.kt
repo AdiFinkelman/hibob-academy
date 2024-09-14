@@ -43,5 +43,7 @@ enum class PetType {
 }
 
 data class AdoptionRequest(
-    val ownerId: Long
+    val adoptedPetId: Long,
+    val companyId: Long,
+    val newOwnerId: Long
 )

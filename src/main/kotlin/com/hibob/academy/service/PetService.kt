@@ -1,9 +1,7 @@
 package com.hibob.academy.service
 
-import com.hibob.academy.dao.Pet
-import com.hibob.academy.dao.PetCreationRequest
-import com.hibob.academy.dao.PetDao
-import com.hibob.academy.dao.PetType
+import com.hibob.academy.dao.*
+import jakarta.ws.rs.NotFoundException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import java.time.LocalDate
@@ -11,14 +9,8 @@ import java.time.LocalDate
 @Component
 class PetService @Autowired constructor(private val petDao: PetDao) {
 
-    private val companyId = 2L
-
-    fun getAllPetsByCompanyId(): List<Pet> {
+    fun getAllPetsByCompanyId(companyId: Long): List<Pet> {
         return petDao.getAllPetsByCompanyId(companyId)
-    }
-
-    fun getAllPetsByType(type: PetType): List<Pet> {
-        return petDao.getAllPetsByType(type, companyId)
     }
 
     fun createNewPet(pet: Pet) {
@@ -26,7 +18,9 @@ class PetService @Autowired constructor(private val petDao: PetDao) {
         petDao.createNewPet(petCreationRequest)
     }
 
-    fun adoptPet(pet: Pet, ownerId: Long) {
-        petDao.adoptPet(pet, ownerId)
+    //jooq task
+    fun adoptPet(adoptionRequest: AdoptionRequest) {
+        val pet = getAllPetsByCompanyId(adoptionRequest.companyId).find { it.id == adoptionRequest.adoptedPetId } ?: throw NotFoundException("Pet not found")
+        return petDao.adoptPet(pet, adoptionRequest.newOwnerId)
     }
 }

@@ -15,11 +15,12 @@ import java.util.concurrent.CopyOnWriteArrayList
 class OwnerResource(private val ownerService: OwnerService) {
 
     private val allOwners: MutableList<Owner> = CopyOnWriteArrayList()
+    private val companyId = 2L
 
     @GET
     @Path("/{ownerId}")
     fun getOwnerById(@PathParam("ownerId") ownerId: Long?): Response {
-        val owners = ownerService.getAllOwnersByCompanyId()
+        val owners = ownerService.getAllOwnersByCompanyId(companyId)
         val owner = owners.find { it.id == ownerId }
         return owner?.let {
             Response.ok(owner).build()
@@ -28,16 +29,15 @@ class OwnerResource(private val ownerService: OwnerService) {
 
     @GET
     fun getAllOwners(): Response {
-        val owners = ownerService.getAllOwnersByCompanyId()
+        val owners = ownerService.getAllOwnersByCompanyId(companyId)
         return Response.ok(owners).build()
     }
 
+    //jooq task
     @GET
-    @Path("/{petId}/owner")
-    fun getOwnerByPetId(@PathParam("petId") petId: Long): Response {
-        val owner = ownerService.getOwnerByPetId(petId)
-            ?: throw NotFoundException("Owner not found")
-
+    @Path("/pet/{petId}/company/{companyId}")
+    fun getOwnerByPetId(@PathParam("petId") petId: Long, @PathParam("companyId") companyId: Long): Response {
+        val owner = ownerService.getOwnerByPetId(petId, companyId)
         return Response.ok(owner).build()
     }
 
@@ -45,9 +45,10 @@ class OwnerResource(private val ownerService: OwnerService) {
     fun addOwner(owner: Owner): Response {
         val newOwnerId = (allOwners.maxOfOrNull { it.id } ?: 0) + 1
         val (firstName, lastName) = extractFirstAndLastName(owner)
-        val newOwner = owner.copy(id = newOwnerId, name = "$firstName $lastName", firstName = firstName, lastName = lastName)
+        val newOwner =
+            owner.copy(id = newOwnerId, name = "$firstName $lastName", firstName = firstName, lastName = lastName)
         allOwners.add(newOwner)
-        ownerService.createNewOwner(newOwner)
+        ownerService.createNewOwner(newOwner, companyId)
 
         return Response.ok()
             .entity(allOwners)
@@ -89,9 +90,12 @@ class OwnerResource(private val ownerService: OwnerService) {
         return Pair(firstName, lastName)
     }
 
-    private fun updateFirstAndLastName(updatedOwner: Owner): Pair<String?, String?>  {
-        val firstName = updatedOwner.name.split(" ").firstOrNull() ?: updatedOwner.firstName ?: throw BadRequestException("First name not found")
-        val lastName = updatedOwner.name.split(" ").drop(1).joinToString(" ").takeIf { it.isNotBlank() } ?: updatedOwner.lastName ?: throw BadRequestException("Last name not found")
+    private fun updateFirstAndLastName(updatedOwner: Owner): Pair<String?, String?> {
+        val firstName = updatedOwner.name.split(" ").firstOrNull() ?: updatedOwner.firstName
+        ?: throw BadRequestException("First name not found")
+        val lastName =
+            updatedOwner.name.split(" ").drop(1).joinToString(" ").takeIf { it.isNotBlank() } ?: updatedOwner.lastName
+            ?: throw BadRequestException("Last name not found")
 
         return Pair(firstName, lastName)
     }
