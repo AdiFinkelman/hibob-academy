@@ -1,6 +1,7 @@
 package com.hibob.academy.resource
 
 import com.hibob.academy.dao.Owner
+import com.hibob.academy.service.OwnerService
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
@@ -11,14 +12,15 @@ import java.util.concurrent.CopyOnWriteArrayList
 @Path("/api/adi/owners")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-class OwnerResource() {
+class OwnerResource(private val ownerService: OwnerService) {
 
     private val allOwners: MutableList<Owner> = CopyOnWriteArrayList()
 
     @GET
     @Path("/{ownerId}")
     fun getOwnerById(@PathParam("ownerId") ownerId: Long?): Response {
-        val owner = allOwners.find { it.id == ownerId }
+        val owners = ownerService.getAllOwnersByCompanyId()
+        val owner = owners.find { it.id == ownerId }
         return owner?.let {
             Response.ok(owner).build()
         } ?: throw NotFoundException("Owner not found")
@@ -26,7 +28,17 @@ class OwnerResource() {
 
     @GET
     fun getAllOwners(): Response {
-        return Response.ok(allOwners).build()
+        val owners = ownerService.getAllOwnersByCompanyId()
+        return Response.ok(owners).build()
+    }
+
+    @GET
+    @Path("/{petId}/owner")
+    fun getOwnerByPetId(@PathParam("petId") petId: Long): Response {
+        val owner = ownerService.getOwnerByPetId(petId)
+            ?: throw NotFoundException("Owner not found")
+
+        return Response.ok(owner).build()
     }
 
     @POST
@@ -35,6 +47,7 @@ class OwnerResource() {
         val (firstName, lastName) = extractFirstAndLastName(owner)
         val newOwner = owner.copy(id = newOwnerId, name = "$firstName $lastName", firstName = firstName, lastName = lastName)
         allOwners.add(newOwner)
+        ownerService.createNewOwner(newOwner)
 
         return Response.ok()
             .entity(allOwners)
