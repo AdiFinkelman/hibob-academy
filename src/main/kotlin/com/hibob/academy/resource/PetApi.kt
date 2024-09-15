@@ -1,19 +1,22 @@
 package com.hibob.academy.resource
 
+import com.hibob.academy.dao.AdoptionRequest
 import com.hibob.academy.dao.Pet
+import com.hibob.academy.dao.PetCreationRequest
+import com.hibob.academy.service.PetService
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.Response
 import org.springframework.stereotype.Controller
-import java.time.LocalDate
 import java.util.concurrent.CopyOnWriteArrayList
 
 @Controller
 @Path("/api/adi/pets")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-class PetsResource {
+class PetsResource(private val petService: PetService) {
 
+    private val companyId = 2L
     private val allPets: MutableList<Pet> = CopyOnWriteArrayList()
 
     @GET
@@ -30,17 +33,25 @@ class PetsResource {
 
     @GET
     fun getAllPets(): Response {
-        return Response.ok(allPets).build()
+        val pets = petService.getAllPetsByCompanyId(companyId)
+        return Response.ok(pets).build()
     }
 
     @POST
-    fun addPet(pet: Pet): Response {
-        val newPetId = (allPets.maxOfOrNull { it.id } ?: 0) + 1
-        val newPet = pet.copy(id = newPetId, arrivalDate = LocalDate.now())
-        allPets.add(newPet)
+    fun addPet(petCreationRequest: PetCreationRequest): Response {
+        val petToAdd = petService.createNewPet(petCreationRequest)
 
         return Response.ok()
-            .entity(newPet)
+            .entity(petToAdd)
+            .build()
+    }
+
+    //jooq task
+    @PUT
+    @Path("/adopt")
+    fun adoptPet(adoptionRequest: AdoptionRequest): Response {
+        petService.adoptPet(adoptionRequest)
+        return Response.ok()
             .build()
     }
 
@@ -70,3 +81,4 @@ class PetsResource {
             ?: throw NotFoundException("Pet not found")
     }
 }
+

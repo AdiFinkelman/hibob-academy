@@ -41,3 +41,9 @@ data class OwnerCreationRequest(
 enum class PetType {
     DOG, CAT, BIRD, MOUSE
 }
+
+data class AdoptionRequest(
+    val adoptedPetId: Long,
+    val companyId: Long,
+    val newOwnerId: Long
+)
