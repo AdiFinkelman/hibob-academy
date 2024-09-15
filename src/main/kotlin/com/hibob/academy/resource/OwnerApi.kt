@@ -1,6 +1,7 @@
 package com.hibob.academy.resource
 
 import com.hibob.academy.dao.Owner
+import com.hibob.academy.dao.OwnerCreationRequest
 import com.hibob.academy.service.OwnerService
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
@@ -20,8 +21,7 @@ class OwnerResource(private val ownerService: OwnerService) {
     @GET
     @Path("/{ownerId}")
     fun getOwnerById(@PathParam("ownerId") ownerId: Long?): Response {
-        val owners = ownerService.getAllOwnersByCompanyId(companyId)
-        val owner = owners.find { it.id == ownerId }
+        val owner = allOwners.find { it.id == ownerId }
         return owner?.let {
             Response.ok(owner).build()
         } ?: throw NotFoundException("Owner not found")
@@ -42,12 +42,10 @@ class OwnerResource(private val ownerService: OwnerService) {
     }
 
     @POST
-    fun addOwner(owner: Owner): Response {
-        val newOwnerId = (allOwners.maxOfOrNull { it.id } ?: 0) + 1
-        val (firstName, lastName) = extractFirstAndLastName(owner)
+    fun addOwner(ownerCreationRequest: OwnerCreationRequest): Response {
+        val (firstName, lastName) = extractFirstAndLastName(ownerCreationRequest)
         val newOwner =
-            owner.copy(id = newOwnerId, name = "$firstName $lastName", firstName = firstName, lastName = lastName)
-        allOwners.add(newOwner)
+            ownerCreationRequest.copy(name = "$firstName $lastName", firstName = firstName, lastName = lastName)
         ownerService.createNewOwner(newOwner, companyId)
 
         return Response.ok()
@@ -82,10 +80,10 @@ class OwnerResource(private val ownerService: OwnerService) {
             ?: throw NotFoundException("Owner not found")
     }
 
-    private fun extractFirstAndLastName(owner: Owner): Pair<String?, String?> {
-        val firstName = owner.name.split(" ").first()
-        val lastName = owner.name.split(" ").drop(1).joinToString(" ").takeIf { it.isNotBlank() }
-            ?: owner.lastName ?: throw BadRequestException("Last name is required")
+    private fun extractFirstAndLastName(ownerCreationRequest: OwnerCreationRequest): Pair<String?, String?> {
+        val firstName = ownerCreationRequest.name.split(" ").first()
+        val lastName = ownerCreationRequest.name.split(" ").drop(1).joinToString(" ").takeIf { it.isNotBlank() }
+            ?: ownerCreationRequest.lastName ?: throw BadRequestException("Last name is required")
 
         return Pair(firstName, lastName)
     }

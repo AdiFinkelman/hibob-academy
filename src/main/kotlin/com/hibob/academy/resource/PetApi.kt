@@ -2,6 +2,7 @@ package com.hibob.academy.resource
 
 import com.hibob.academy.dao.AdoptionRequest
 import com.hibob.academy.dao.Pet
+import com.hibob.academy.dao.PetCreationRequest
 import com.hibob.academy.service.PetService
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
@@ -37,8 +38,8 @@ class PetsResource(private val petService: PetService) {
     }
 
     @POST
-    fun addPet(pet: Pet): Response {
-        val petToAdd = petService.createNewPet(pet)
+    fun addPet(petCreationRequest: PetCreationRequest): Response {
+        val petToAdd = petService.createNewPet(petCreationRequest)
 
         return Response.ok()
             .entity(petToAdd)
@@ -49,9 +50,8 @@ class PetsResource(private val petService: PetService) {
     @PUT
     @Path("/adopt")
     fun adoptPet(adoptionRequest: AdoptionRequest): Response {
-        val petRequest = petService.adoptPet(adoptionRequest)
+        petService.adoptPet(adoptionRequest)
         return Response.ok()
-            .entity(petRequest)
             .build()
             ?: throw NotFoundException("Pet not found")
     }

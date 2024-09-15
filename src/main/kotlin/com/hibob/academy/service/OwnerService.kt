@@ -15,14 +15,12 @@ class OwnerService @Autowired constructor(
         return ownerDao.getAllOwnersByCompanyId(companyId)
     }
 
-    fun createNewOwner(owner: Owner, companyId: Long) {
-        val ownerCreationRequest =
-            OwnerCreationRequest(owner.name, owner.firstName, owner.lastName, owner.companyId, owner.employeeId)
+    fun createNewOwner(ownerCreationRequest: OwnerCreationRequest, companyId: Long) {
         ownerDao.createNewOwner(ownerCreationRequest)
     }
 
     //jooq task
-    fun getOwnerByPetId(petId: Long, companyId: Long): Owner? {
+    fun getOwnerByPetId(petId: Long, companyId: Long): Owner {
         val pet = getPetById(petId, companyId)
         return getOwnerFromDao(pet, companyId)
     }
