@@ -1,8 +1,7 @@
 package com.hibob.academy.service
 
 import com.hibob.bootcamp.unittests.*
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.kotlin.any
@@ -18,10 +17,11 @@ class UserServiceTest {
     private val userService = UserService(userDao, notificationService, emailVerificationService)
 
     @Test
-    fun `register null user and throws exception`() {
+    fun `registerUser should throw exception if user already exists`() {
         val user = User(1 ,"Adi Finkelman", "adifi436@gmail.com", "1234", true)
         whenever(userDao.findById(user.id)).thenReturn(user)
-        assertThrows<IllegalArgumentException> { userService.registerUser(user) }
+        val expectedMessage = assertThrows<IllegalArgumentException> { userService.registerUser(user) }
+        assertEquals("User already exists", expectedMessage.message)
     }
 
     @Test
@@ -29,7 +29,8 @@ class UserServiceTest {
         val user = User(1, "Adi Finkelman", "adifi436@gmail.com", "1234", false)
         whenever(userDao.findById(user.id)).thenReturn(null)
         whenever((userDao).save(any())).thenReturn(false)
-        assertThrows<IllegalStateException> { userService.registerUser(user) }
+        val expectedMessage = assertThrows<IllegalStateException> { userService.registerUser(user) }
+        assertEquals("User registration failed", expectedMessage.message)
         verify(userDao).save(user)
     }
 
@@ -39,7 +40,8 @@ class UserServiceTest {
         whenever(userDao.findById(user.id)).thenReturn(null)
         whenever((userDao).save(any())).thenReturn(true)
         whenever(emailVerificationService.sendVerificationEmail(any())).thenReturn(false)
-        assertThrows<IllegalStateException> { userService.registerUser(user) }
+        val expectedMessage = assertThrows<IllegalStateException> { userService.registerUser(user) }
+        assertEquals("Failed to send verification email", expectedMessage.message)
         verify(userDao).save(user)
         verify(emailVerificationService).sendVerificationEmail(user.email)
     }
@@ -59,7 +61,8 @@ class UserServiceTest {
     fun `verify user email with user null throws exception`() {
         val user = User(1, "Adi", "adi@gmail.com", "1234", false)
         whenever(userDao.findById(user.id)).thenReturn(null)
-        assertThrows<IllegalArgumentException> { userService.verifyUserEmail(user.id, "token") }
+        val expectedMessage = assertThrows<IllegalArgumentException> { userService.verifyUserEmail(user.id, "token") }
+        assertEquals("User not found", expectedMessage.message)
     }
 
     @Test
@@ -67,7 +70,8 @@ class UserServiceTest {
         val user = User(1, "Adi", "adi@gmail.com", "1234", false)
         whenever(userDao.findById(user.id)).thenReturn(user)
         whenever(emailVerificationService.verifyEmail(any(), any())).thenReturn(false)
-        assertThrows<IllegalArgumentException> { userService.verifyUserEmail(user.id, "token") }
+        val expectedMessage = assertThrows<IllegalArgumentException> { userService.verifyUserEmail(user.id, "token") }
+        assertEquals("Email verification failed", expectedMessage.message)
         verify(emailVerificationService).verifyEmail(any(), any())
     }
 
