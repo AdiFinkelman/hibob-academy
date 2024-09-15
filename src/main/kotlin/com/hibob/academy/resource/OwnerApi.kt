@@ -20,7 +20,7 @@ class OwnerResource(private val ownerService: OwnerService) {
 
     @GET
     @Path("/{ownerId}")
-    fun getOwnerById(@PathParam("ownerId") ownerId: Long?): Response {
+    fun getOwnerById(@PathParam("ownerId") ownerId: Long): Response {
         val owner = allOwners.find { it.id == ownerId }
         return owner?.let {
             Response.ok(owner).build()
