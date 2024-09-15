@@ -53,7 +53,6 @@ class PetsResource(private val petService: PetService) {
         petService.adoptPet(adoptionRequest)
         return Response.ok()
             .build()
-            ?: throw NotFoundException("Pet not found")
     }
 
     @PUT
