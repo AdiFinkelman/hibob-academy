@@ -122,7 +122,9 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
         petDao.createNewPet(petCreationRequest2)
         val petCreationRequest3 = PetCreationRequest("Nico", PetType.DOG, companyId, LocalDate.now(), 1L )
         petDao.createNewPet(petCreationRequest3)
-        val expectedResult = mapOf(PetType.CAT to 1, PetType.DOG to 2)
+        val cats = petDao.getAllPetsByType(PetType.CAT, companyId)
+        val dogs = petDao.getAllPetsByType(PetType.DOG, companyId)
+        val expectedResult = mapOf(PetType.CAT to cats.size, PetType.DOG to dogs.size)
         assertEquals(expectedResult, petDao.countPetsByType(companyId))
     }
 

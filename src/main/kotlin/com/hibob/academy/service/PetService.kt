@@ -26,7 +26,7 @@ class PetService @Autowired constructor(private val petDao: PetDao) {
         return petDao.getPetsByOwner(ownerId, companyId)
     }
 
-    fun countPetsByType(): Map<PetType, Int> {
-        return petDao.countPetsByType()
+    fun countPetsByType(companyId: Long): Map<PetType, Int> {
+        return petDao.countPetsByType(companyId)
     }
 }

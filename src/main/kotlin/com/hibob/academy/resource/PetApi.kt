@@ -57,7 +57,7 @@ class PetsResource(private val petService: PetService) {
     @GET
     @Path("/count")
     fun countPetsByType(): Response {
-        val numberOfPets = petService.countPetsByType()
+        val numberOfPets = petService.countPetsByType(companyId)
         return Response.ok(numberOfPets).build()
     }
 
