@@ -46,6 +46,21 @@ class PetsResource(private val petService: PetService) {
             .build()
     }
 
+    //SQL 2
+    @GET
+    @Path("/owner/{ownerId}")
+    fun getPetsByOwnerId(@PathParam("ownerId") ownerId: Long): Response {
+        val pets = petService.getPetsByOwner(ownerId, companyId)
+        return Response.ok(pets).build()
+    }
+
+    @GET
+    @Path("/count")
+    fun countPetsByType(): Response {
+        val numberOfPets = petService.countPetsByType()
+        return Response.ok(numberOfPets).build()
+    }
+
     //jooq task
     @PUT
     @Path("/adopt")
