@@ -20,7 +20,7 @@ data class PetCreationRequest(
     val arrivalDate: LocalDate,
     val ownerId: Long?
 ) {
-    fun extractPetCreationToPet(petCreationRequest: PetCreationRequest, id: Long): Pet {
+    fun extractFromPetCreationToPet(petCreationRequest: PetCreationRequest, id: Long): Pet {
         val pet = Pet(
             id = id,
             name = petCreationRequest.name,
@@ -49,7 +49,7 @@ data class OwnerCreationRequest(
     val companyId: Long,
     val employeeId: String
 ) {
-    fun extractOwnerCreationToOwner(ownerCreationRequest: OwnerCreationRequest, id: Long): Owner {
+    fun extractFromOwnerCreationToOwner(ownerCreationRequest: OwnerCreationRequest, id: Long): Owner {
         val owner = Owner(
             id = id,
             name = ownerCreationRequest.name,
