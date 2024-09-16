@@ -56,12 +56,6 @@ class PetDao @Autowired constructor(private val sql: DSLContext) {
             .execute()
     }
 
-    //Jooq batch
-    fun adoptMultiplePets(pets: List<Pet>, ownerId: Long) {
-        pets.forEach { pet ->
-            adoptPet(pet, ownerId)
-        }
-    }
     //sql 2
     fun getPetsByOwner(ownerId: Long, companyId: Long): List<Pet> =
         sql.select(petTable.id, petTable.name, petTable.type, petTable.companyId, petTable.dateOfArrival, petTable.ownerId)
@@ -77,6 +71,12 @@ class PetDao @Autowired constructor(private val sql: DSLContext) {
             .groupBy(petTable.type)
             .fetchMap(petTable.type, DSL.count())
             .mapKeys { PetType.valueOf(it.key) }
+    }
+
+    fun adoptMultiplePets(pets: List<Pet>, ownerId: Long) {
+        pets.forEach { pet ->
+            adoptPet(pet, ownerId)
+        }
     }
 
     fun createMultiplePets(pets: List<PetCreationRequest>){
