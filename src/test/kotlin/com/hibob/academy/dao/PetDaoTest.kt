@@ -22,8 +22,8 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
     @Test
     fun `create pet and get all pets`() {
         val expectedResult = listOf(pet1, pet2).map { it.name }
-        petDao.createNewPet(pet1)
-        petDao.createNewPet(pet2)
+        val id1 = petDao.createNewPet(pet1)
+        val id2 = petDao.createNewPet(pet2)
         assertEquals(expectedResult , petDao.getAllPetsByCompanyId(companyId).map { it.name })
     }
 
