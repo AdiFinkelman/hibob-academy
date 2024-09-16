@@ -35,7 +35,7 @@ class VaccineTable(tableName: String = "vaccine") : JooqTable(tableName) {
     }
 }
 
-class VaccineToPetTable(tableName: String = "vaccineToPet") : JooqTable(tableName) {
+class VaccineToPetTable(tableName: String = "vaccine_to_pet") : JooqTable(tableName) {
     val vaccineId = createBigIntField("vaccine_id")
     val petId = createBigIntField("pet_id")
     val vaccinationDate = createLocalDateField("vaccination_date")
