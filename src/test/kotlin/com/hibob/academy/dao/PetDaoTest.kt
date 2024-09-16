@@ -117,6 +117,48 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
     }
 
     @Test
+    fun `create multiple pets successfully`() {
+        val ids = petDao.createMultiplePets(listOf(petCreationRequest1, petCreationRequest2))
+        val petId1 = ids[0]
+        val petId2 = ids[1]
+        val pet1 = petCreationRequest1.extractToPet(petId1)
+        val pet2 = petCreationRequest2.extractToPet(petId2)
+        val expectedResult = listOf(pet1, pet2)
+        assertEquals(expectedResult, petDao.getAllPetsByCompanyId(companyId))
+    }
+
+    @Test
+    fun `create multiple pets with empty list`() {
+        val ids = petDao.createMultiplePets(emptyList())
+        assertTrue(ids.isEmpty())
+    }
+
+    @Test
+    fun `create duplicate pets multiple times`() {
+        val petCreationRequests = listOf(petCreationRequest1, petCreationRequest1)
+        val ids = petDao.createMultiplePets(petCreationRequests)
+        val pet1 = petCreationRequest1.extractToPet(ids[0])
+        val pet2 = petCreationRequest1.extractToPet(ids[1])
+        val pets = listOf(pet1, pet2)
+        assertEquals(pets, petDao.getAllPetsByCompanyId(companyId))
+    }
+
+    @Test
+    fun `adopt multiple pets successfully`() {
+        val ownerId = 3L
+        val id1 = petDao.createNewPet(petCreationRequest1)
+        val id2 = petDao.createNewPet(petCreationRequest2)
+        val pet1 = petCreationRequest1.extractToPet(id1)
+        val pet2 = petCreationRequest2.extractToPet(id2)
+        val updatedPet1 = pet1.copy(ownerId = ownerId)
+        val updatedPet2 = pet2.copy(ownerId = ownerId)
+        val pets = listOf(updatedPet1, updatedPet2)
+        petDao.adoptMultiplePets(pets, ownerId)
+        assertEquals(ownerId, pets[0].ownerId)
+        assertEquals(ownerId, pets[1].ownerId)
+    }
+
+    @Test
     fun `count pets by type`() {
         petDao.createNewPet(petCreationRequest1)
         petDao.createNewPet(petCreationRequest2)
@@ -130,6 +172,20 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
     fun `count pets by type for empty list`() {
         val expectedResult = emptyMap<String, Int>()
         assertEquals(expectedResult, petDao.countPetsByType(companyId))
+    }
+    @Test
+    fun `adopt empty pets list`() {
+        val ownerId = 3L
+        val pets = emptyList<Pet>()
+        assertDoesNotThrow{ petDao.adoptMultiplePets(pets, ownerId) }
+    }
+
+    @Test
+    fun `adopt pets already adopted by the same owner`() {
+        val ownerId = 2L
+        val pet1 = Pet(1, "Tom", PetType.CAT, companyId, LocalDate.now(), ownerId)
+        val pet2 = Pet(2, "Luke", PetType.DOG, companyId, LocalDate.now(), ownerId)
+        assertDoesNotThrow{ petDao.adoptMultiplePets(listOf(pet1, pet2), ownerId) }
     }
 
     @BeforeEach

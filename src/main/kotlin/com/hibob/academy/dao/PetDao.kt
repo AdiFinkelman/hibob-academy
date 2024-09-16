@@ -56,6 +56,12 @@ class PetDao @Autowired constructor(private val sql: DSLContext) {
             .execute()
     }
 
+    //Jooq batch
+    fun adoptMultiplePets(pets: List<Pet>, ownerId: Long) {
+        pets.forEach { pet ->
+            adoptPet(pet, ownerId)
+        }
+    }
     //sql 2
     fun getPetsByOwner(ownerId: Long, companyId: Long): List<Pet> =
         sql.select(petTable.id, petTable.name, petTable.type, petTable.companyId, petTable.dateOfArrival, petTable.ownerId)
@@ -72,4 +78,32 @@ class PetDao @Autowired constructor(private val sql: DSLContext) {
             .fetchMap(petTable.type, DSL.count())
             .mapKeys { PetType.valueOf(it.key) }
     }
+
+    fun createMultiplePets(pets: List<PetCreationRequest>): List<Long> {
+        if (pets.isEmpty())
+            return emptyList()
+
+        val insert = sql.insertInto(petTable)
+            .columns(petTable.name, petTable.type, petTable.companyId, petTable.dateOfArrival, petTable.ownerId)
+            .values(
+                DSL.param(petTable.name),
+                DSL.param(petTable.type),
+                DSL.param(petTable.companyId),
+                DSL.param(petTable.dateOfArrival),
+                DSL.param(petTable.ownerId)
+            )
+        val batch = sql.batch(insert)
+        pets.forEach { batch.bind(it.name, it.type, it.companyId, it.arrivalDate, it.ownerId) }
+        batch.execute()
+
+        return getPetId(petTable, pets)
+    }
+
+    private fun getPetId(table: PetTable, pets: List<PetCreationRequest>): List<Long> {
+        return sql.select(table.id)
+            .from(table)
+            .where(table.name.`in`(pets.map { it.name }))
+            .fetch(table.id)
+            .map { it }
+        }
 }
