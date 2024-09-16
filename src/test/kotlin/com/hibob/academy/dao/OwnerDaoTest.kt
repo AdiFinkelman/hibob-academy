@@ -92,12 +92,19 @@ class OwnerDaoTest @Autowired constructor(private val sql: DSLContext) {
     @BeforeEach
     @AfterEach
     fun cleanup() {
-        sql.deleteFrom(ownerTable)
-            .where(ownerTable.companyId.eq(companyId))
-            .execute()
+        deleteOwnerTable(ownerTable, companyId)
+        deletePetTable(petTable, companyId)
+    }
 
-        sql.deleteFrom(petTable)
-            .where(petTable.companyId.eq(companyId))
+    private fun deletePetTable(table: PetTable, companyId: Long) {
+        sql.deleteFrom(table)
+            .where(table.companyId.eq(companyId))
+            .execute()
+    }
+
+    private fun deleteOwnerTable(table: OwnerTable, companyId: Long) {
+        sql.deleteFrom(table)
+            .where(table.companyId.eq(companyId))
             .execute()
     }
 }

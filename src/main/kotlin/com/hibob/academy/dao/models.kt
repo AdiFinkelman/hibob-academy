@@ -20,7 +20,7 @@ data class PetCreationRequest(
     val arrivalDate: LocalDate,
     val ownerId: Long?
 ) {
-    private fun extractPetCreationToPet(petCreationRequest: PetCreationRequest, id: Long): Pet {
+    fun extractPetCreationToPet(petCreationRequest: PetCreationRequest, id: Long): Pet {
         val pet = Pet(
             id = id,
             name = petCreationRequest.name,
