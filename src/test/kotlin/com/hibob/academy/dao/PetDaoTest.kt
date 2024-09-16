@@ -14,7 +14,7 @@ import java.time.LocalDate
 class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
 
     private val petDao = PetDao(sql)
-    val table = PetTable.instance
+    val petTable = PetTable.instance
     private val companyId = 1L
     private val companyIdTest = 3L
     val petCreationRequest1 = PetCreationRequest("Tom", PetType.CAT, companyId, LocalDate.now(), 1L )
@@ -26,7 +26,7 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
         val id2 = petDao.createNewPet(petCreationRequest2)
         val pet1 = petCreationRequest1.extractPetCreationToPet(petCreationRequest1, id1)
         val pet2 = petCreationRequest2.extractPetCreationToPet(petCreationRequest2, id2)
-        val expectedResult = setOf(pet1, pet2)
+        val expectedResult = listOf(pet1, pet2)
         assertEquals(expectedResult , petDao.getAllPetsByCompanyId(companyId))
     }
 
@@ -91,11 +91,11 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
     @BeforeEach
     @AfterEach
     fun cleanup() {
-        deleteTable(table, companyId)
-        deleteTable(table, companyIdTest)
+        deletePetTable(petTable, companyId)
+        deletePetTable(petTable, companyIdTest)
     }
 
-    private fun deleteTable(table: PetTable, companyId: Long) {
+    private fun deletePetTable(table: PetTable, companyId: Long) {
         sql.deleteFrom(table)
             .where(table.companyId.eq(companyId))
             .execute()
