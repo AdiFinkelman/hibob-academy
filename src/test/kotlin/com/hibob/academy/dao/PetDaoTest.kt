@@ -24,8 +24,8 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
     fun `create pet and get all pets`() {
         val id1 = petDao.createNewPet(petCreationRequest1)
         val id2 = petDao.createNewPet(petCreationRequest2)
-        val pet1 = petCreationRequest1.extractFromPetCreationToPet(petCreationRequest1, id1)
-        val pet2 = petCreationRequest2.extractFromPetCreationToPet(petCreationRequest2, id2)
+        val pet1 = petCreationRequest1.extractToPet(id1)
+        val pet2 = petCreationRequest2.extractToPet(id2)
         val expectedResult = listOf(pet1, pet2)
         assertEquals(expectedResult , petDao.getAllPetsByCompanyId(companyId))
     }
@@ -40,8 +40,8 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
     fun `create duplicate pet and throws exception`() {
         val id1 = petDao.createNewPet(petCreationRequest1)
         val id2 = petDao.createNewPet(petCreationRequest1)
-        val pet1 = petCreationRequest1.extractFromPetCreationToPet(petCreationRequest1, id1)
-        val pet2 = petCreationRequest1.extractFromPetCreationToPet(petCreationRequest1, id2)
+        val pet1 = petCreationRequest1.extractToPet(id1)
+        val pet2 = petCreationRequest1.extractToPet(id2)
         val expectedResult = listOf(pet1, pet2)
         assertEquals(expectedResult, petDao.getAllPetsByCompanyId(companyId))
     }
@@ -51,7 +51,7 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
         val id1 = petDao.createNewPet(petCreationRequest1)
         val petCreation3 = PetCreationRequest("Tom", PetType.CAT, companyIdTest, LocalDate.now(), 1L )
         petDao.createNewPet(petCreation3)
-        val pet1 = petCreationRequest1.extractFromPetCreationToPet(petCreationRequest1, id1)
+        val pet1 = petCreationRequest1.extractToPet(id1)
         val expectedResult = listOf(pet1)
         assertEquals(expectedResult, petDao.getAllPetsByCompanyId(companyId))
     }
@@ -60,10 +60,10 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
     fun `get all pets by type`() {
         val petCreationRequest3 = PetCreationRequest("Garfield", PetType.CAT, companyId, LocalDate.now(), 1L )
         val id1 = petDao.createNewPet(petCreationRequest1)
-        val pet1 = petCreationRequest1.extractFromPetCreationToPet(petCreationRequest1, id1)
+        val pet1 = petCreationRequest1.extractToPet(id1)
         petDao.createNewPet(petCreationRequest2)
         val id3 = petDao.createNewPet(petCreationRequest3)
-        val pet3 = petCreationRequest3.extractFromPetCreationToPet(petCreationRequest3, id3)
+        val pet3 = petCreationRequest3.extractToPet(id3)
         val expectedResult = listOf(pet1, pet3)
         assertEquals(expectedResult, petDao.getAllPetsByType(PetType.CAT, companyId))
     }
@@ -73,7 +73,7 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
         val ownerId = 2L
         val petCreationRequest = PetCreationRequest("Tom", PetType.CAT, companyId, LocalDate.now(), null )
         val petId = petDao.createNewPet(petCreationRequest)
-        val pet = petCreationRequest.extractFromPetCreationToPet(petCreationRequest, petId)
+        val pet = petCreationRequest.extractToPet(petId)
         petDao.adoptPet(pet, ownerId)
         assertEquals(ownerId, petDao.getAllPetsByCompanyId(companyId)[0].ownerId)
     }
@@ -83,7 +83,7 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
         val newOwnerId = 2L
         val petCreationRequest = PetCreationRequest("Tom", PetType.CAT, companyId, LocalDate.now(), newOwnerId)
         val petId = petDao.createNewPet(petCreationRequest)
-        val pet = petCreationRequest.extractFromPetCreationToPet(petCreationRequest, petId)
+        val pet = petCreationRequest.extractToPet(petId)
         petDao.adoptPet(pet, newOwnerId)
         assertEquals(newOwnerId, petDao.getAllPetsByCompanyId(companyId)[0].ownerId)
     }

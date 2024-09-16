@@ -20,14 +20,14 @@ data class PetCreationRequest(
     val arrivalDate: LocalDate,
     val ownerId: Long?
 ) {
-    fun extractFromPetCreationToPet(petCreationRequest: PetCreationRequest, id: Long): Pet {
+    fun extractToPet(id: Long): Pet {
         val pet = Pet(
             id = id,
-            name = petCreationRequest.name,
-            type = petCreationRequest.type,
-            companyId = petCreationRequest.companyId,
-            arrivalDate = petCreationRequest.arrivalDate,
-            ownerId = petCreationRequest.ownerId,
+            name = this.name,
+            type = this.type,
+            companyId = this.companyId,
+            arrivalDate = this.arrivalDate,
+            ownerId = this.ownerId,
         )
         return pet
     }
@@ -49,14 +49,14 @@ data class OwnerCreationRequest(
     val companyId: Long,
     val employeeId: String
 ) {
-    fun extractFromOwnerCreationToOwner(ownerCreationRequest: OwnerCreationRequest, id: Long): Owner {
+    fun extractToOwner(id: Long): Owner {
         val owner = Owner(
             id = id,
-            name = ownerCreationRequest.name,
-            firstName = ownerCreationRequest.firstName,
-            lastName = ownerCreationRequest.lastName,
-            companyId = ownerCreationRequest.companyId,
-            employeeId = ownerCreationRequest.employeeId,
+            name = this.name,
+            firstName = this.firstName,
+            lastName = this.lastName,
+            companyId = this.companyId,
+            employeeId = this.employeeId,
         )
         return owner
     }

@@ -26,8 +26,8 @@ class OwnerDaoTest @Autowired constructor(private val sql: DSLContext) {
     fun `create owner test`() {
         val id1 = ownerDao.createNewOwner(ownerCreationRequest1)
         val id2 = ownerDao.createNewOwner(ownerCreationRequest2)
-        val owner1 = ownerCreationRequest1.extractFromOwnerCreationToOwner(ownerCreationRequest1, id1)
-        val owner2 = ownerCreationRequest2.extractFromOwnerCreationToOwner(ownerCreationRequest2, id2)
+        val owner1 = ownerCreationRequest1.extractToOwner(id1)
+        val owner2 = ownerCreationRequest2.extractToOwner(id2)
         val expectedResult = listOf(owner1, owner2)
         assertEquals(expectedResult, ownerDao.getAllOwnersByCompanyId(companyId))
     }
@@ -55,10 +55,10 @@ class OwnerDaoTest @Autowired constructor(private val sql: DSLContext) {
     @Test
     fun `create multiple owner with same companyId and different employeeId`() {
         val id1 = ownerDao.createNewOwner(ownerCreationRequest1)
-        val owner1 = ownerCreationRequest1.extractFromOwnerCreationToOwner(ownerCreationRequest1, id1)
+        val owner1 = ownerCreationRequest1.extractToOwner(id1)
         val ownerCreationRequest3 = OwnerCreationRequest("Ori Finkelman", "Ori", "Finkelman", companyId, "1")
         val id3 = ownerDao.createNewOwner(ownerCreationRequest3)
-        val owner3 = ownerCreationRequest3.extractFromOwnerCreationToOwner(ownerCreationRequest3, id3)
+        val owner3 = ownerCreationRequest3.extractToOwner(id3)
         val expectedResult = listOf(owner1, owner3).sortedBy { it.id }
         assertEquals(expectedResult, ownerDao.getAllOwnersByCompanyId(companyId).sortedBy { it.id })
     }
@@ -77,7 +77,7 @@ class OwnerDaoTest @Autowired constructor(private val sql: DSLContext) {
         val petId = petDao.createNewPet(petCreationRequest)
 
         val fetchedOwner = ownerDao.getOwnerByPetId(petId, companyId)
-        val expectedOwner = ownerCreationRequest1.extractFromOwnerCreationToOwner(ownerCreationRequest1, ownerId)
+        val expectedOwner = ownerCreationRequest1.extractToOwner(ownerId)
         assertEquals(expectedOwner, fetchedOwner)
     }
 
