@@ -7,7 +7,7 @@
  */
 
 data class Product(val name: String?, val price: Double?)
-
+/*
 fun main() {
     val products = listOf(
         Product("Laptop", 999.99),
@@ -20,6 +20,8 @@ fun main() {
     // Task: Print the details of products only if both name and price are not null.
 
 }
+
+ */
 
 fun printProductDetailsIfBothNotNull(products: List<Product>) {
     products.forEach{ product ->

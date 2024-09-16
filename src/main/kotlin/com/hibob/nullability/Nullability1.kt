@@ -7,7 +7,7 @@ package com.hibob.bootcamp
  * Ensure your solution handles both user1 and user2 correctly.
  */
 data class User(val name: String?, val email: String?)
-
+/*
 fun main() {
     val user1: User = User("Alice", null)
     val user2: User = User(null, "alice@example.com")
@@ -21,3 +21,6 @@ fun main() {
     } ?: println("Email not provided")
     // Task: Print user email or "Email not provided" if null
 }
+
+
+ */

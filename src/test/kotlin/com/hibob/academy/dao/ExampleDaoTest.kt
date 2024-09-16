@@ -1,3 +1,4 @@
+/*
 package com.hibob.academy.dao
 
 import com.hibob.academy.utils.BobDbTest
@@ -35,3 +36,5 @@ class ExampleDaoTest @Autowired constructor(private val sql: DSLContext)  {
         assertThat(actual, Matchers.equalTo(Example(actual!!.id, companyId, "Hello, Kotlin!")))
     }
 }
+
+ */

@@ -8,7 +8,7 @@ import java.time.LocalDate
 3. Implement pretty print using buildString function
 4. Make SpidermanMovieProduceActions nullable (if not so yet) and make the relevant adjustments
 */
-
+/*
 fun main() {
     val movie = SpidermanNoWayHome()
     val runner = Runner(movie)
@@ -18,7 +18,7 @@ fun main() {
     println("Pretty print:\n${movie.prettyPrint()}")
 //    println("Json: ${movie.toJson()}")
 }
-
+*/
 fun printSuccessMessage(success: Boolean) {
     if (success) {
         println("The movie created successfully")

@@ -17,7 +17,7 @@ data class Participant(
 fun addParticipant(participants: MutableList<Participant>, participant: Participant) {
     participants.add(participant)
 }
-
+/*
 fun main() {
     val p1 = Participant("Adi", "adifi436@gmail.com")
     val uk = UKLocation("Westminster", "London", "UK", "1111")
@@ -29,5 +29,5 @@ fun main() {
     println(uk)
     println(us)
 }
-
+*/
 
