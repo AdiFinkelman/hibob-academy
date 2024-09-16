@@ -64,10 +64,11 @@ class PetDao @Autowired constructor(private val sql: DSLContext) {
             .and(petTable.companyId.eq(companyId))
             .fetch(petMapper)
 
-    fun countPetsByType(): Map<String, Int> {
+    fun countPetsByType(): Map<PetType, Int> {
         return sql.select(petTable.type, DSL.count())
             .from(petTable)
             .groupBy(petTable.type)
             .fetchMap(petTable.type, DSL.count())
+            .mapKeys { PetType.valueOf(it.key) }
     }
 }

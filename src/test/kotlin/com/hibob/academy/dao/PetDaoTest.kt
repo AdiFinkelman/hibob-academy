@@ -105,9 +105,9 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
     }
 
     @Test
-    fun `get pets by owner when owners id are different`() {
+    fun `get pets by owner id when owners id are different`() {
         val ownerId = 2L
-        petDao.createNewPet(petCreationRequest1) //insert to db
+        petDao.createNewPet(petCreationRequest1) //insert to db -> instead of id1
         val id2 = petDao.createNewPet(petCreationRequest2)
         val pet2 = petCreationRequest2.extractToPet(id2) //insert to db
         val expectedResult = listOf(pet2)
