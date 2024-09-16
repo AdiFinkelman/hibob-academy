@@ -37,7 +37,7 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
     }
 
     @Test
-    fun `create duplicate pet successfully`() {
+    fun `create duplicate pets successfully`() {
         val id1 = petDao.createNewPet(petCreationRequest1)
         val id2 = petDao.createNewPet(petCreationRequest1)
         val pet1 = petCreationRequest1.extractToPet(id1)
@@ -86,6 +86,48 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
         val pet = petCreationRequest.extractToPet(petId)
         petDao.adoptPet(pet, newOwnerId)
         assertEquals(newOwnerId, petDao.getAllPetsByCompanyId(companyId)[0].ownerId)
+    }
+
+    //sql 2 tests
+    @Test
+    fun `get pets by owner`() {
+        val ownerId = 2L
+        val id1 = petDao.createNewPet(petCreationRequest1)
+        val id2 = petDao.createNewPet(petCreationRequest2)
+        val pet1 = petCreationRequest1.extractToPet(id1)
+        val pet2 = petCreationRequest2.extractToPet(id2)
+        petDao.adoptPet(pet1, ownerId)
+        petDao.adoptPet(pet2, ownerId)
+        val updatedPet1 = pet1.copy(ownerId = ownerId)
+        val updatedPet2 = pet2.copy(ownerId = ownerId)
+        val expectedResult = listOf(updatedPet1, updatedPet2)
+        assertEquals(expectedResult, petDao.getPetsByOwner(ownerId, companyId))
+    }
+
+    @Test
+    fun `get pets by owner id when owners id are different`() {
+        val ownerId = 2L
+        petDao.createNewPet(petCreationRequest1) //insert to db -> instead of id1
+        val id2 = petDao.createNewPet(petCreationRequest2)
+        val pet2 = petCreationRequest2.extractToPet(id2) //insert to db
+        val expectedResult = listOf(pet2)
+        assertEquals(expectedResult, petDao.getPetsByOwner(ownerId, companyId))
+    }
+
+    @Test
+    fun `count pets by type`() {
+        petDao.createNewPet(petCreationRequest1)
+        petDao.createNewPet(petCreationRequest2)
+        val petCreationRequest3 = PetCreationRequest("Nico", PetType.DOG, companyId, LocalDate.now(), 1L )
+        petDao.createNewPet(petCreationRequest3)
+        val expectedResult = mapOf(PetType.CAT to 1, PetType.DOG to 2)
+        assertEquals(expectedResult, petDao.countPetsByType())
+    }
+
+    @Test
+    fun `count pets by type for empty list`() {
+        val expectedResult = emptyMap<String, Int>()
+        assertEquals(expectedResult, petDao.countPetsByType())
     }
 
     @BeforeEach
