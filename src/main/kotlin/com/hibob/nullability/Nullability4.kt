@@ -10,7 +10,7 @@ package com.hibob.bootcamp
  **/
 data class Address(val city: String?, val street: String?)
 data class Employee(val name: String?, val address: Address?)
-
+/*
 fun main() {
     val employees = listOf(
         Employee("John", Address("New York", "Fifth Ave")),
@@ -22,6 +22,8 @@ fun main() {
 
     // Task: Print each employee's city safely. If the city is not available, print "City Unknown".
 }
+
+ */
 
 fun printEmployeeCitySafely(employees: List<Employee>) {
     employees.forEach { employee ->

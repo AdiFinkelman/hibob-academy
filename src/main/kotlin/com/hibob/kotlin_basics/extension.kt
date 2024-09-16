@@ -11,10 +11,11 @@ fun List<Int>.sum(): Int {
 fun Number.toPowerOf(num: Double, exponent: Double): Double {
     return num.pow(exponent)
 }
-
+/*
 fun main() {
     val sum = listOf(1,2,3).sum()
     val num: Number = 2
     println(sum)
     println(num.toPowerOf(2.0, 3.0))
 }
+ */

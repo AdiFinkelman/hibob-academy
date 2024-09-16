@@ -97,7 +97,7 @@ fun ex5() {
 
     println(b)
 }
-
+/*
 fun main() {
     ex1()
     ex2()
@@ -105,3 +105,5 @@ fun main() {
     ex4()
     ex5()
 }
+
+ */

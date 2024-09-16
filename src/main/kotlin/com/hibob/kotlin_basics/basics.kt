@@ -9,7 +9,7 @@ package com.hibob.kotlin_basics
 //a = 1, b= 5
 //a = 1, b= 1
 //a=3, b= 2
-
+/*
 fun main() {
     // 1
     println("Hello World")
@@ -50,3 +50,4 @@ fun areNumbersEquals(n1: Int, n2: Int) : String {
 fun printMaxValue(num1: Int, num2: Int) = if (num1 > num2) println(num1) else println(num2)
 
 fun multiplication(a: Int=1, b: Int=1): Int = a * b
+*/

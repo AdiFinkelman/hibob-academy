@@ -21,12 +21,14 @@ fun initializeNullableCustomers(): List<Customer?> {
         Customer("Emily White", null)
     )
 }
-
+/*
 fun main() {
     val customers = initializeNullableCustomers()
     // Task: Print each customer's name, account ID, and account balance. Handle all null cases appropriately.
     printCustomerDetails(customers)
 }
+
+ */
 
 fun printCustomerDetails(customers: List<Customer?>) {
     customers.forEach { customer ->
