@@ -37,7 +37,7 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
     }
 
     @Test
-    fun `create duplicate pets successfully`() {
+    fun `create duplicate pet and throws exception`() {
         val id1 = petDao.createNewPet(petCreationRequest1)
         val id2 = petDao.createNewPet(petCreationRequest1)
         val pet1 = petCreationRequest1.extractToPet(id1)
