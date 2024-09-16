@@ -19,7 +19,19 @@ data class PetCreationRequest(
     val companyId: Long,
     val arrivalDate: LocalDate,
     val ownerId: Long?
-)
+) {
+    fun extractToPet(id: Long): Pet {
+        val pet = Pet(
+            id = id,
+            name = this.name,
+            type = this.type,
+            companyId = this.companyId,
+            arrivalDate = this.arrivalDate,
+            ownerId = this.ownerId,
+        )
+        return pet
+    }
+}
 
 data class Owner(
     val id: Long,
@@ -36,7 +48,19 @@ data class OwnerCreationRequest(
     val lastName: String?,
     val companyId: Long,
     val employeeId: String
-)
+) {
+    fun extractToOwner(id: Long): Owner {
+        val owner = Owner(
+            id = id,
+            name = this.name,
+            firstName = this.firstName,
+            lastName = this.lastName,
+            companyId = this.companyId,
+            employeeId = this.employeeId,
+        )
+        return owner
+    }
+}
 
 enum class PetType {
     DOG, CAT, BIRD, MOUSE

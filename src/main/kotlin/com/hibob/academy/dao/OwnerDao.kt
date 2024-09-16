@@ -33,14 +33,15 @@ class OwnerDao @Autowired constructor(private val sql: DSLContext) {
             .where(ownerTable.companyId.eq(companyId))
             .fetch(ownerMapper)
 
-    fun createNewOwner(owner: OwnerCreationRequest) {
-        sql.insertInto(ownerTable)
+    fun createNewOwner(owner: OwnerCreationRequest): Long {
+        return sql.insertInto(ownerTable)
             .set(ownerTable.name, owner.name)
             .set(ownerTable.companyId, owner.companyId)
             .set(ownerTable.employeeId, owner.employeeId)
             .onConflict(ownerTable.companyId, ownerTable.employeeId)
             .doNothing()
-            .execute()
+            .returning(ownerTable.id)
+            .fetchOne()!![ownerTable.id] ?: -1
     }
 
     fun getOwnerByPetId(petId: Long, companyId: Long): Owner? =

@@ -36,14 +36,15 @@ class PetDao @Autowired constructor(private val sql: DSLContext) {
             .and(petTable.companyId.eq(companyId))
             .fetch(petMapper)
 
-    fun createNewPet(pet: PetCreationRequest) {
-        sql.insertInto(petTable)
+    fun createNewPet(pet: PetCreationRequest): Long {
+        return sql.insertInto(petTable)
             .set(petTable.name, pet.name)
             .set(petTable.type, pet.type.toString())
             .set(petTable.companyId, pet.companyId)
             .set(petTable.dateOfArrival, pet.arrivalDate)
             .set(petTable.ownerId, pet.ownerId)
-            .execute()
+            .returning(petTable.id)
+            .fetchOne()!![petTable.id]
     }
 
     fun adoptPet(pet: Pet, ownerId: Long) {
