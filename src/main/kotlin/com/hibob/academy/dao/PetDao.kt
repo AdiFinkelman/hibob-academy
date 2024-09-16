@@ -79,9 +79,8 @@ class PetDao @Autowired constructor(private val sql: DSLContext) {
             .mapKeys { PetType.valueOf(it.key) }
     }
 
-    fun createMultiplePets(pets: List<PetCreationRequest>): List<Long> {
-        if (pets.isEmpty())
-            return emptyList()
+    fun createMultiplePets(pets: List<PetCreationRequest>){
+        if (pets.isEmpty()) return
 
         val insert = sql.insertInto(petTable)
             .columns(petTable.name, petTable.type, petTable.companyId, petTable.dateOfArrival, petTable.ownerId)
@@ -95,15 +94,5 @@ class PetDao @Autowired constructor(private val sql: DSLContext) {
         val batch = sql.batch(insert)
         pets.forEach { batch.bind(it.name, it.type, it.companyId, it.arrivalDate, it.ownerId) }
         batch.execute()
-
-        return getPetId(petTable, pets)
     }
-
-    private fun getPetId(table: PetTable, pets: List<PetCreationRequest>): List<Long> {
-        return sql.select(table.id)
-            .from(table)
-            .where(table.name.`in`(pets.map { it.name }))
-            .fetch(table.id)
-            .map { it }
-        }
 }

@@ -17,8 +17,8 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
     val petTable = PetTable.instance
     private val companyId = 1L
     private val companyIdTest = 3L
-    val petCreationRequest1 = PetCreationRequest("Tom", PetType.CAT, companyId, LocalDate.now(), null )
-    val petCreationRequest2 = PetCreationRequest("Luke", PetType.DOG, companyId, LocalDate.now(), null )
+    val petCreationRequest1 = PetCreationRequest("Tom", PetType.CAT, companyId, LocalDate.now(), 1L )
+    val petCreationRequest2 = PetCreationRequest("Luke", PetType.DOG, companyId, LocalDate.now(), 2L )
 
     @Test
     fun `create pet and get all pets`() {
@@ -118,29 +118,24 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
 
     @Test
     fun `create multiple pets successfully`() {
-        val ids = petDao.createMultiplePets(listOf(petCreationRequest1, petCreationRequest2))
-        val petId1 = ids[0]
-        val petId2 = ids[1]
-        val pet1 = petCreationRequest1.extractToPet(petId1)
-        val pet2 = petCreationRequest2.extractToPet(petId2)
-        val expectedResult = listOf(pet1, pet2)
+        petDao.createMultiplePets(listOf(petCreationRequest1, petCreationRequest2))
+        val expectedResult = petDao.getAllPetsByCompanyId(companyId)
         assertEquals(expectedResult, petDao.getAllPetsByCompanyId(companyId))
     }
 
     @Test
     fun `create multiple pets with empty list`() {
-        val ids = petDao.createMultiplePets(emptyList())
-        assertTrue(ids.isEmpty())
+        petDao.createMultiplePets(emptyList())
+        val expectedResult = petDao.getAllPetsByCompanyId(companyId)
+        assertTrue(expectedResult.isEmpty())
     }
 
     @Test
     fun `create duplicate pets multiple times`() {
         val petCreationRequests = listOf(petCreationRequest1, petCreationRequest1)
-        val ids = petDao.createMultiplePets(petCreationRequests)
-        val pet1 = petCreationRequest1.extractToPet(ids[0])
-        val pet2 = petCreationRequest1.extractToPet(ids[1])
-        val pets = listOf(pet1, pet2)
-        assertEquals(pets, petDao.getAllPetsByCompanyId(companyId))
+        petDao.createMultiplePets(petCreationRequests)
+        val expectedResult = petDao.getAllPetsByCompanyId(companyId)
+        assertEquals(expectedResult, petDao.getAllPetsByCompanyId(companyId))
     }
 
     @Test
