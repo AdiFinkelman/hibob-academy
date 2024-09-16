@@ -59,8 +59,8 @@ class OwnerDaoTest @Autowired constructor(private val sql: DSLContext) {
         val ownerCreationRequest3 = OwnerCreationRequest("Ori Finkelman", "Ori", "Finkelman", companyId, "1")
         val id3 = ownerDao.createNewOwner(ownerCreationRequest3)
         val owner3 = ownerCreationRequest3.extractOwnerCreationToOwner(ownerCreationRequest3, id3)
-        val expectedResult = listOf(owner1, owner3)
-        assertEquals(expectedResult, ownerDao.getAllOwnersByCompanyId(companyId))
+        val expectedResult = listOf(owner1, owner3).sortedBy { it.id }
+        assertEquals(expectedResult, ownerDao.getAllOwnersByCompanyId(companyId).sortedBy { it.id })
     }
 
     @Test
