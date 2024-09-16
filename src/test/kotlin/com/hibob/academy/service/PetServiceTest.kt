@@ -14,6 +14,7 @@ import java.time.LocalDate
 class PetServiceTest {
     private val petDao = mock<PetDao>()
     private val petService = PetService(petDao)
+    val companyId = 1L
 
     @Test
     fun `get all pets by company id`() {
@@ -52,5 +53,24 @@ class PetServiceTest {
         whenever(petDao.getAllPetsByCompanyId(companyId)).thenReturn(pets)
         petService.adoptPet(adoptionRequest)
         verify(petDao).adoptPet(any(), any())
+    }
+
+    @Test
+    fun `get pets by owner`() {
+        val companyId = 2L
+        val ownerId = 1L
+        val pet1 = Pet(1, "Tom", PetType.CAT, companyId, LocalDate.now(), 1)
+        val pet2 = Pet(2, "Garfield", PetType.CAT, companyId, LocalDate.now(), 1)
+        val pets = listOf(pet1, pet2)
+        whenever(petDao.getPetsByOwner(ownerId, companyId)).thenReturn(pets)
+        assertEquals(pets, petService.getPetsByOwner(ownerId, companyId))
+    }
+
+    @Test
+    fun `count pets by type`() {
+        val expectedResult = mapOf(PetType.CAT to 2, PetType.DOG to 1)
+        whenever(petDao.countPetsByType(companyId)).thenReturn(expectedResult)
+        assertEquals(expectedResult, petService.countPetsByType(companyId))
+        verify(petDao).countPetsByType(companyId)
     }
 }
