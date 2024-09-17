@@ -100,9 +100,7 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
         val pet2 = petCreationRequest2.extractToPet(id2)
         petDao.adoptPet(pet1, ownerId)
         petDao.adoptPet(pet2, ownerId)
-        val updatedPet1 = petDao.getAllPetsByCompanyId(companyId)[0]
-        val updatedPet2 = petDao.getAllPetsByCompanyId(companyId)[1]
-        val expectedResult = listOf(updatedPet1, updatedPet2)
+        val expectedResult = petDao.getAllPetsByCompanyId(companyId)
         assertEquals(expectedResult, petDao.getPetsByOwner(ownerId, companyId))
     }
 
