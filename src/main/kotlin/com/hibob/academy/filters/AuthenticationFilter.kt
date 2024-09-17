@@ -1,16 +1,12 @@
 package com.hibob.academy.filters
 
 import com.hibob.academy.service.SessionService
-import io.jsonwebtoken.Claims
-import io.jsonwebtoken.Jws
 import io.jsonwebtoken.Jwts
 import jakarta.ws.rs.container.ContainerRequestContext
 import jakarta.ws.rs.container.ContainerRequestFilter
 import jakarta.ws.rs.core.Response
 import jakarta.ws.rs.ext.Provider
-import org.apache.http.auth.AUTH
 import org.springframework.stereotype.Component
-import javax.crypto.SecretKey
 
 
 @Component
@@ -29,20 +25,29 @@ class AuthenticationFilter(private val sessionService: SessionService) : Contain
         }
         val token = requestContext.cookies[AUTH]?.value?.trim()
 
+        if (token.isNullOrEmpty())
+            unauthorizedUser(requestContext)
+
         verify(token, requestContext)
     }
 
     fun verify(token: String?, requestContext: ContainerRequestContext) {
-        try {
-            Jwts.parserBuilder()
-                .setSigningKey(sessionService.secretKey)
-                .build()
-        } catch (e: Exception) {
-            requestContext.abortWith(
-                Response.status(Response.Status.UNAUTHORIZED)
-                    .entity("User cannot access the resource")
+        token.let {
+            try {
+                Jwts.parserBuilder()
+                    .setSigningKey(sessionService.secretKey)
                     .build()
-            )
+            } catch (e: Exception) {
+                    unauthorizedUser(requestContext)
+            }
         }
+    }
+
+    private fun unauthorizedUser(requestContext: ContainerRequestContext) {
+        requestContext.abortWith(
+            Response.status(Response.Status.UNAUTHORIZED)
+                .entity("User cannot access the resource")
+                .build()
+        )
     }
 }
