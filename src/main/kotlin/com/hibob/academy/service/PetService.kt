@@ -1,6 +1,7 @@
 package com.hibob.academy.service
 
 import com.hibob.academy.dao.*
+import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.NotFoundException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -31,6 +32,7 @@ class PetService @Autowired constructor(private val petDao: PetDao) {
     }
 
     fun createMultiplePets(pets: List<PetCreationRequest>) {
+        if (pets.isEmpty()) throw BadRequestException("The pets list is empty")
         petDao.createMultiplePets(pets)
     }
 }

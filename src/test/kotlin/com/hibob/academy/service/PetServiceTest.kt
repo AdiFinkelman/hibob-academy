@@ -1,6 +1,7 @@
 package com.hibob.academy.service
 
 import com.hibob.academy.dao.*
+import jakarta.ws.rs.BadRequestException
 import jakarta.ws.rs.NotFoundException
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -55,11 +56,43 @@ class PetServiceTest {
     }
 
     @Test
-    fun `adopt multiple pets`() {
+    fun `adopt multiple pets with empty list`() {
         val companyId = 2L
         val newOwnerId = 1L
-        val pet1 = AdoptionCreationRequest(1, companyId)
-        val pet2 = AdoptionCreationRequest(2, companyId)
-        val multiAdoptionRequest = MultiAdoptionRequest(listOf(pet1, pet2), companyId, newOwnerId)
+        val multiAdoptionRequest = MultiAdoptionRequest(emptyList(), companyId, newOwnerId)
+        whenever(petDao.getAllPetsByCompanyId(multiAdoptionRequest.companyId)).thenReturn(emptyList())
+        assertEquals(emptyList<PetCreationRequest>(), multiAdoptionRequest.petsToAdopt)
+    }
+
+    @Test
+    fun `adopt multiple pets successfully`() {
+        val companyId = 2L
+        val newOwnerId = 1L
+        val adoptionRequest1 = AdoptionCreationRequest(1, companyId)
+        val adoptionRequest2 = AdoptionCreationRequest(2, companyId)
+        val adoptionRequests = listOf(adoptionRequest1, adoptionRequest2)
+        val multiAdoptionRequest = MultiAdoptionRequest(adoptionRequests, companyId, newOwnerId)
+        val pet1 = Pet(1, "Tom", PetType.CAT, companyId, LocalDate.now(), 1)
+        val pet2 = Pet(2, "Garfield", PetType.CAT, companyId, LocalDate.now(), 1)
+        whenever(petDao.getAllPetsByCompanyId(multiAdoptionRequest.companyId)).thenReturn(listOf(pet1, pet2))
+        petService.adoptMultiplePets(multiAdoptionRequest)
+        verify(petDao).adoptMultiplePets(listOf(pet1, pet2), newOwnerId)
+    }
+
+    @Test
+    fun `create multiple pets when pets empty and throws exception`() {
+        val petCreationRequests = emptyList<PetCreationRequest>()
+        val expectedMessage = assertThrows<BadRequestException> { petService.createMultiplePets(petCreationRequests) }
+        assertEquals("The pets list is empty", expectedMessage.message)
+    }
+
+    @Test
+    fun `create multiple pets successfully`() {
+        val companyId = 2L
+        val petCreation1 = PetCreationRequest("Tom", PetType.CAT, companyId, LocalDate.now(), 1)
+        val petCreation2 = PetCreationRequest("Garfield", PetType.CAT, companyId, LocalDate.now(), 1)
+        val petCreationRequests = listOf(petCreation1, petCreation2)
+        petService.createMultiplePets(petCreationRequests)
+        verify(petDao).createMultiplePets(petCreationRequests)
     }
 }
