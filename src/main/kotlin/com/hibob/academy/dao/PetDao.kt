@@ -1,5 +1,6 @@
 package com.hibob.academy.dao
 
+import jakarta.ws.rs.BadRequestException
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.RecordMapper
@@ -80,7 +81,7 @@ class PetDao @Autowired constructor(private val sql: DSLContext) {
     }
 
     fun createMultiplePets(pets: List<PetCreationRequest>){
-        if (pets.isEmpty()) return
+        if (pets.isEmpty()) throw BadRequestException("The pets list is empty")
 
         val insert = sql.insertInto(petTable)
             .columns(petTable.name, petTable.type, petTable.companyId, petTable.dateOfArrival, petTable.ownerId)

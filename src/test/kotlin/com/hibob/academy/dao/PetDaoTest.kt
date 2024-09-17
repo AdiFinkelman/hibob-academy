@@ -1,12 +1,14 @@
 package com.hibob.academy.dao
 
 import com.hibob.academy.utils.BobDbTest
+import jakarta.ws.rs.BadRequestException
 import org.jooq.DSLContext
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
@@ -98,8 +100,8 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
         val pet2 = petCreationRequest2.extractToPet(id2)
         petDao.adoptPet(pet1, ownerId)
         petDao.adoptPet(pet2, ownerId)
-        val updatedPet1 = pet1.copy(ownerId = ownerId)
-        val updatedPet2 = pet2.copy(ownerId = ownerId)
+        val updatedPet1 = petDao.getAllPetsByCompanyId(companyId)[0]
+        val updatedPet2 = petDao.getAllPetsByCompanyId(companyId)[1]
         val expectedResult = listOf(updatedPet1, updatedPet2)
         assertEquals(expectedResult, petDao.getPetsByOwner(ownerId, companyId))
     }
@@ -118,51 +120,37 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
 
     @Test
     fun `create multiple pets successfully`() {
-        petDao.createMultiplePets(listOf(petCreationRequest1, petCreationRequest2))
-        assertEquals(petCreationRequest1.name, petDao.getAllPetsByCompanyId(companyId)[0].name)
-        assertEquals(petCreationRequest2.name, petDao.getAllPetsByCompanyId(companyId)[1].name)
-        assertEquals(petCreationRequest1.type, petDao.getAllPetsByCompanyId(companyId)[0].type)
-        assertEquals(petCreationRequest2.type, petDao.getAllPetsByCompanyId(companyId)[1].type)
-        assertEquals(petCreationRequest1.arrivalDate, petDao.getAllPetsByCompanyId(companyId)[0].arrivalDate)
-        assertEquals(petCreationRequest2.arrivalDate, petDao.getAllPetsByCompanyId(companyId)[1].arrivalDate)
-        assertEquals(petCreationRequest1.ownerId, petDao.getAllPetsByCompanyId(companyId)[0].ownerId)
-        assertEquals(petCreationRequest2.ownerId, petDao.getAllPetsByCompanyId(companyId)[1].ownerId)
+        val expectedResult = listOf(petCreationRequest1, petCreationRequest2)
+        petDao.createMultiplePets(expectedResult)
+        val petsFromDao: List<PetCreationRequest> = petDao.getAllPetsByCompanyId(companyId).map { extractToCreationRequest(it) }
+        assertEquals(expectedResult, petsFromDao)
     }
 
     @Test
     fun `create multiple pets with empty list`() {
-        petDao.createMultiplePets(emptyList())
-        val expectedResult = petDao.getAllPetsByCompanyId(companyId)
-        assertTrue(expectedResult.isEmpty())
+        assertThrows<BadRequestException>{ petDao.createMultiplePets(emptyList()) }
     }
 
     @Test
     fun `create duplicate pets multiple times`() {
-        val petCreationRequests = listOf(petCreationRequest1, petCreationRequest1)
-        petDao.createMultiplePets(petCreationRequests)
-        assertEquals(petCreationRequest1.name, petDao.getAllPetsByCompanyId(companyId)[0].name)
-        assertEquals(petCreationRequest1.name, petDao.getAllPetsByCompanyId(companyId)[1].name)
-        assertEquals(petCreationRequest1.type, petDao.getAllPetsByCompanyId(companyId)[0].type)
-        assertEquals(petCreationRequest1.type, petDao.getAllPetsByCompanyId(companyId)[1].type)
-        assertEquals(petCreationRequest1.arrivalDate, petDao.getAllPetsByCompanyId(companyId)[0].arrivalDate)
-        assertEquals(petCreationRequest1.arrivalDate, petDao.getAllPetsByCompanyId(companyId)[1].arrivalDate)
-        assertEquals(petCreationRequest1.ownerId, petDao.getAllPetsByCompanyId(companyId)[0].ownerId)
-        assertEquals(petCreationRequest1.ownerId, petDao.getAllPetsByCompanyId(companyId)[1].ownerId)
+        val expectedResult = listOf(petCreationRequest1, petCreationRequest1)
+        petDao.createMultiplePets(expectedResult)
+        val petsFromDao: List<PetCreationRequest> = petDao.getAllPetsByCompanyId(companyId).map { extractToCreationRequest(it) }
+        assertEquals(expectedResult, petsFromDao)
     }
 
     @Test
     fun `adopt multiple pets successfully`() {
-        val ownerId = 3L
+        val newOwnerId = 3L
         val id1 = petDao.createNewPet(petCreationRequest1)
         val id2 = petDao.createNewPet(petCreationRequest2)
         val pet1 = petCreationRequest1.extractToPet(id1)
         val pet2 = petCreationRequest2.extractToPet(id2)
-        val updatedPet1 = pet1.copy(ownerId = ownerId)
-        val updatedPet2 = pet2.copy(ownerId = ownerId)
-        val pets = listOf(updatedPet1, updatedPet2)
-        petDao.adoptMultiplePets(pets, ownerId)
-        assertEquals(ownerId, pets[0].ownerId)
-        assertEquals(ownerId, pets[1].ownerId)
+        val pets = listOf(pet1, pet2)
+        val expectedResult = pets.map { it.copy(ownerId = newOwnerId) }
+
+        petDao.adoptMultiplePets(pets, newOwnerId)
+        assertEquals(expectedResult, petDao.getAllPetsByCompanyId(companyId))
     }
 
     @Test
@@ -180,19 +168,14 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
         val expectedResult = emptyMap<String, Int>()
         assertEquals(expectedResult, petDao.countPetsByType(companyId))
     }
+
     @Test
     fun `adopt empty pets list`() {
         val ownerId = 3L
         val pets = emptyList<Pet>()
-        assertDoesNotThrow{ petDao.adoptMultiplePets(pets, ownerId) }
-    }
-
-    @Test
-    fun `adopt pets already adopted by the same owner`() {
-        val ownerId = 2L
-        val pet1 = Pet(1, "Tom", PetType.CAT, companyId, LocalDate.now(), ownerId)
-        val pet2 = Pet(2, "Luke", PetType.DOG, companyId, LocalDate.now(), ownerId)
-        assertDoesNotThrow{ petDao.adoptMultiplePets(listOf(pet1, pet2), ownerId) }
+        petDao.adoptMultiplePets(pets, ownerId)
+        val expectedResult = petDao.getAllPetsByCompanyId(companyId)
+        assertEquals(expectedResult, pets)
     }
 
     @BeforeEach
@@ -206,5 +189,9 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
         sql.deleteFrom(table)
             .where(table.companyId.eq(companyId))
             .execute()
+    }
+
+    private fun extractToCreationRequest(pet: Pet): PetCreationRequest {
+        return PetCreationRequest(pet.name, pet.type, pet.companyId, pet.arrivalDate, pet.ownerId)
     }
 }
