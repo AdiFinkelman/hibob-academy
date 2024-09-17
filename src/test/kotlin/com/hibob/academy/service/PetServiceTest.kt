@@ -53,4 +53,13 @@ class PetServiceTest {
         petService.adoptPet(adoptionRequest)
         verify(petDao).adoptPet(any(), any())
     }
+
+    @Test
+    fun `adopt multiple pets`() {
+        val companyId = 2L
+        val newOwnerId = 1L
+        val pet1 = AdoptionCreationRequest(1, companyId)
+        val pet2 = AdoptionCreationRequest(2, companyId)
+        val multiAdoptionRequest = MultiAdoptionRequest(listOf(pet1, pet2), companyId, newOwnerId)
+    }
 }

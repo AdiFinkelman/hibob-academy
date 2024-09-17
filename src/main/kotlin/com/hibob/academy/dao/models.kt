@@ -71,3 +71,14 @@ data class AdoptionRequest(
     val companyId: Long,
     val newOwnerId: Long
 )
+
+data class AdoptionCreationRequest(
+    val adoptedPetId: Long,
+    val companyId: Long
+)
+
+data class MultiAdoptionRequest(
+    val petsToAdopt: List<AdoptionCreationRequest>,
+    val companyId: Long,
+    val newOwnerId: Long
+)

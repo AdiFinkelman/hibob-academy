@@ -1,6 +1,7 @@
 package com.hibob.academy.resource
 
 import com.hibob.academy.dao.AdoptionRequest
+import com.hibob.academy.dao.MultiAdoptionRequest
 import com.hibob.academy.dao.Pet
 import com.hibob.academy.dao.PetCreationRequest
 import com.hibob.academy.service.PetService
@@ -34,11 +35,31 @@ class PetsResource(private val petService: PetService) {
             .build()
     }
 
+    @POST
+    @Path("/multi")
+    fun createMultiplePets(petCreationRequests: List<PetCreationRequest>): Response {
+        val petsToCreate = petService.createMultiplePets(petCreationRequests)
+
+        return Response
+            .ok(petsToCreate)
+            .build()
+    }
+
+
     //jooq task
     @PUT
     @Path("/adopt")
     fun adoptPet(adoptionRequest: AdoptionRequest): Response {
         petService.adoptPet(adoptionRequest)
+        return Response.ok()
+            .build()
+    }
+
+    @PUT
+    @Path("/adopt/multi")
+    fun adoptMultiplePets(multiAdoptionRequest: MultiAdoptionRequest): Response {
+        petService.adoptMultiplePets(multiAdoptionRequest)
+
         return Response.ok()
             .build()
     }

@@ -21,4 +21,16 @@ class PetService @Autowired constructor(private val petDao: PetDao) {
         val pet = getAllPetsByCompanyId(adoptionRequest.companyId).find { it.id == adoptionRequest.adoptedPetId } ?: throw NotFoundException("Pet not found")
         petDao.adoptPet(pet, adoptionRequest.newOwnerId)
     }
+
+    fun adoptMultiplePets(multiAdoptionRequest: MultiAdoptionRequest) {
+        val allPets = getAllPetsByCompanyId(multiAdoptionRequest.companyId)
+        val petsToAdopt = allPets.filter { pet ->
+            multiAdoptionRequest.petsToAdopt.any { it.adoptedPetId == pet.id}
+        }
+        petDao.adoptMultiplePets(petsToAdopt, multiAdoptionRequest.newOwnerId)
+    }
+
+    fun createMultiplePets(pets: List<PetCreationRequest>) {
+        petDao.createMultiplePets(pets)
+    }
 }
