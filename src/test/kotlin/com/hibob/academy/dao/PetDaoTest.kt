@@ -119,8 +119,14 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
     @Test
     fun `create multiple pets successfully`() {
         petDao.createMultiplePets(listOf(petCreationRequest1, petCreationRequest2))
-        val expectedResult = petDao.getAllPetsByCompanyId(companyId)
-        assertEquals(expectedResult, petDao.getAllPetsByCompanyId(companyId))
+        assertEquals(petCreationRequest1.name, petDao.getAllPetsByCompanyId(companyId)[0].name)
+        assertEquals(petCreationRequest2.name, petDao.getAllPetsByCompanyId(companyId)[1].name)
+        assertEquals(petCreationRequest1.type, petDao.getAllPetsByCompanyId(companyId)[0].type)
+        assertEquals(petCreationRequest2.type, petDao.getAllPetsByCompanyId(companyId)[1].type)
+        assertEquals(petCreationRequest1.arrivalDate, petDao.getAllPetsByCompanyId(companyId)[0].arrivalDate)
+        assertEquals(petCreationRequest2.arrivalDate, petDao.getAllPetsByCompanyId(companyId)[1].arrivalDate)
+        assertEquals(petCreationRequest1.ownerId, petDao.getAllPetsByCompanyId(companyId)[0].ownerId)
+        assertEquals(petCreationRequest2.ownerId, petDao.getAllPetsByCompanyId(companyId)[1].ownerId)
     }
 
     @Test
@@ -134,8 +140,14 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
     fun `create duplicate pets multiple times`() {
         val petCreationRequests = listOf(petCreationRequest1, petCreationRequest1)
         petDao.createMultiplePets(petCreationRequests)
-        val expectedResult = petDao.getAllPetsByCompanyId(companyId)
-        assertEquals(expectedResult, petDao.getAllPetsByCompanyId(companyId))
+        assertEquals(petCreationRequest1.name, petDao.getAllPetsByCompanyId(companyId)[0].name)
+        assertEquals(petCreationRequest1.name, petDao.getAllPetsByCompanyId(companyId)[1].name)
+        assertEquals(petCreationRequest1.type, petDao.getAllPetsByCompanyId(companyId)[0].type)
+        assertEquals(petCreationRequest1.type, petDao.getAllPetsByCompanyId(companyId)[1].type)
+        assertEquals(petCreationRequest1.arrivalDate, petDao.getAllPetsByCompanyId(companyId)[0].arrivalDate)
+        assertEquals(petCreationRequest1.arrivalDate, petDao.getAllPetsByCompanyId(companyId)[1].arrivalDate)
+        assertEquals(petCreationRequest1.ownerId, petDao.getAllPetsByCompanyId(companyId)[0].ownerId)
+        assertEquals(petCreationRequest1.ownerId, petDao.getAllPetsByCompanyId(companyId)[1].ownerId)
     }
 
     @Test
