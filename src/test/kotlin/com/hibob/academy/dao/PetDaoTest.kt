@@ -110,7 +110,9 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
         petDao.createNewPet(petCreationRequest1) //insert to db -> instead of id1
         val id2 = petDao.createNewPet(petCreationRequest2)
         val pet2 = petCreationRequest2.extractToPet(id2) //insert to db
-        val expectedResult = listOf(pet2)
+        petDao.adoptPet(pet2, ownerId)
+        val updatedPet2 = pet2.copy(ownerId = ownerId)
+        val expectedResult = listOf(updatedPet2)
         assertEquals(expectedResult, petDao.getPetsByOwner(ownerId, companyId))
     }
 
@@ -121,13 +123,13 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
         val petCreationRequest3 = PetCreationRequest("Nico", PetType.DOG, companyId, LocalDate.now(), 1L )
         petDao.createNewPet(petCreationRequest3)
         val expectedResult = mapOf(PetType.CAT to 1, PetType.DOG to 2)
-        assertEquals(expectedResult, petDao.countPetsByType())
+        assertEquals(expectedResult, petDao.countPetsByType(companyId))
     }
 
     @Test
     fun `count pets by type for empty list`() {
         val expectedResult = emptyMap<String, Int>()
-        assertEquals(expectedResult, petDao.countPetsByType())
+        assertEquals(expectedResult, petDao.countPetsByType(companyId))
     }
 
     @BeforeEach
