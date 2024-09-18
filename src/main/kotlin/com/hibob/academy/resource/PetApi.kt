@@ -45,7 +45,6 @@ class PetsResource(private val petService: PetService) {
             .build()
     }
 
-
     //jooq task
     @PUT
     @Path("/adopt")
