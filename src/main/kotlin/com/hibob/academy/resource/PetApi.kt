@@ -48,14 +48,14 @@ class PetsResource(private val petService: PetService) {
 
     //SQL 2
     @GET
-    @Path("/owner/{ownerId}/company/{companyId}")
+    @Path("/{ownerId}/{companyId}")
     fun getPetsByOwnerId(@PathParam("ownerId") ownerId: Long, @PathParam("companyId") companyId: Long): Response {
         val pets = petService.getPetsByOwner(ownerId, companyId)
         return Response.ok(pets).build()
     }
 
     @GET
-    @Path("/count/company/{companyId}")
+    @Path("/count/{companyId}")
     fun countPetsByType(@PathParam("companyId") companyId: Long): Response {
         val numberOfPets = petService.countPetsByType(companyId)
         return Response.ok(numberOfPets).build()
