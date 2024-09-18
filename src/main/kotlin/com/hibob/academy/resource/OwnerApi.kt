@@ -35,7 +35,7 @@ class OwnerResource(private val ownerService: OwnerService) {
 
     //jooq task
     @GET
-    @Path("/pet/{petId}/company/{companyId}")
+    @Path("/{petId}/{companyId}")
     fun getOwnerByPetId(@PathParam("petId") petId: Long, @PathParam("companyId") companyId: Long): Response {
         val owner = ownerService.getOwnerByPetId(petId, companyId)
         return Response.ok(owner).build()
