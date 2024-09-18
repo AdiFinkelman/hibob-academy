@@ -31,7 +31,7 @@ class PetsResource(private val petService: PetService) {
     }
 
     @GET
-    @Path("/company/{companyId}")
+    @Path("/{companyId}")
     fun getAllPets(@PathParam("companyId") companyId: Long): Response {
         val pets = petService.getAllPetsByCompanyId(companyId)
         return Response.ok(pets).build()
