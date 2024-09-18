@@ -18,15 +18,6 @@ class OwnerResource(private val ownerService: OwnerService) {
     private val allOwners: MutableList<Owner> = CopyOnWriteArrayList()
 
     @GET
-    @Path("/{ownerId}")
-    fun getOwnerById(@PathParam("ownerId") ownerId: Long): Response {
-        val owner = allOwners.find { it.id == ownerId }
-        return owner?.let {
-            Response.ok(owner).build()
-        } ?: throw NotFoundException("Owner not found")
-    }
-
-    @GET
     @Path("/{companyId}")
     fun getAllOwners(@PathParam("companyId") companyId: Long): Response {
         val owners = ownerService.getAllOwnersByCompanyId(companyId)

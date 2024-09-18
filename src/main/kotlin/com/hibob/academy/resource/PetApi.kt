@@ -19,18 +19,6 @@ class PetsResource(private val petService: PetService) {
     private val allPets: MutableList<Pet> = CopyOnWriteArrayList()
 
     @GET
-    @Path("/{petId}")
-    fun getPetById(@PathParam("petId") petId: Long): Response {
-        val pet = allPets.find { it.id == petId }
-        return pet?.let {
-            Response.ok()
-                .entity(pet)
-                .build()
-        }
-            ?: throw NotFoundException("Pet not found")
-    }
-
-    @GET
     @Path("/{companyId}")
     fun getAllPets(@PathParam("companyId") companyId: Long): Response {
         val pets = petService.getAllPetsByCompanyId(companyId)
