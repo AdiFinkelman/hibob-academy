@@ -1,12 +1,14 @@
 package com.hibob.academy.dao
 
 import com.hibob.academy.utils.BobDbTest
+import jakarta.ws.rs.BadRequestException
 import org.jooq.DSLContext
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 
@@ -17,8 +19,8 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
     val petTable = PetTable.instance
     private val companyId = 1L
     private val companyIdTest = 3L
-    val petCreationRequest1 = PetCreationRequest("Tom", PetType.CAT, companyId, LocalDate.now(), null )
-    val petCreationRequest2 = PetCreationRequest("Luke", PetType.DOG, companyId, LocalDate.now(), null )
+    val petCreationRequest1 = PetCreationRequest("Tom", PetType.CAT, companyId, LocalDate.now(), 1L )
+    val petCreationRequest2 = PetCreationRequest("Luke", PetType.DOG, companyId, LocalDate.now(), 2L )
 
     @Test
     fun `create pet and get all pets`() {
@@ -98,9 +100,7 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
         val pet2 = petCreationRequest2.extractToPet(id2)
         petDao.adoptPet(pet1, ownerId)
         petDao.adoptPet(pet2, ownerId)
-        val updatedPet1 = pet1.copy(ownerId = ownerId)
-        val updatedPet2 = pet2.copy(ownerId = ownerId)
-        val expectedResult = listOf(updatedPet1, updatedPet2)
+        val expectedResult = petDao.getAllPetsByCompanyId(companyId)
         assertEquals(expectedResult, petDao.getPetsByOwner(ownerId, companyId))
     }
 
@@ -114,6 +114,41 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
         val updatedPet2 = pet2.copy(ownerId = ownerId)
         val expectedResult = listOf(updatedPet2)
         assertEquals(expectedResult, petDao.getPetsByOwner(ownerId, companyId))
+    }
+
+    @Test
+    fun `create multiple pets successfully`() {
+        val expectedResult = listOf(petCreationRequest1, petCreationRequest2)
+        petDao.createMultiplePets(expectedResult)
+        val petsFromDao: List<PetCreationRequest> = petDao.getAllPetsByCompanyId(companyId).map { extractToCreationRequest(it) }
+        assertEquals(expectedResult, petsFromDao)
+    }
+
+    @Test
+    fun `create multiple pets with empty list`() {
+        assertThrows<BadRequestException>{ petDao.createMultiplePets(emptyList()) }
+    }
+
+    @Test
+    fun `create duplicate pets multiple times`() {
+        val expectedResult = listOf(petCreationRequest1, petCreationRequest1)
+        petDao.createMultiplePets(expectedResult)
+        val petsFromDao: List<PetCreationRequest> = petDao.getAllPetsByCompanyId(companyId).map { extractToCreationRequest(it) }
+        assertEquals(expectedResult, petsFromDao)
+    }
+
+    @Test
+    fun `adopt multiple pets successfully`() {
+        val newOwnerId = 3L
+        val id1 = petDao.createNewPet(petCreationRequest1)
+        val id2 = petDao.createNewPet(petCreationRequest2)
+        val pet1 = petCreationRequest1.extractToPet(id1)
+        val pet2 = petCreationRequest2.extractToPet(id2)
+        val pets = listOf(pet1, pet2)
+        val expectedResult = pets.map { it.copy(ownerId = newOwnerId) }
+
+        petDao.adoptMultiplePets(pets, newOwnerId)
+        assertEquals(expectedResult, petDao.getAllPetsByCompanyId(companyId))
     }
 
     @Test
@@ -132,6 +167,14 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
         assertEquals(expectedResult, petDao.countPetsByType(companyId))
     }
 
+    @Test
+    fun `adopt empty pets list`() {
+        val ownerId = 3L
+        val pets = emptyList<Pet>()
+        val expectedMessage = assertThrows<BadRequestException> { petDao.adoptMultiplePets(pets, ownerId) }
+        assertEquals("Pets cannot be empty", expectedMessage.message)
+    }
+
     @BeforeEach
     @AfterEach
     fun cleanup() {
@@ -143,5 +186,9 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
         sql.deleteFrom(table)
             .where(table.companyId.eq(companyId))
             .execute()
+    }
+
+    private fun extractToCreationRequest(pet: Pet): PetCreationRequest {
+        return PetCreationRequest(pet.name, pet.type, pet.companyId, pet.arrivalDate, pet.ownerId)
     }
 }

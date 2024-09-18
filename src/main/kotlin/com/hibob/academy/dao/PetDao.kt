@@ -1,5 +1,6 @@
 package com.hibob.academy.dao
 
+import jakarta.ws.rs.BadRequestException
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.RecordMapper
@@ -71,5 +72,33 @@ class PetDao @Autowired constructor(private val sql: DSLContext) {
             .groupBy(petTable.type)
             .fetchMap(petTable.type, DSL.count())
             .mapKeys { PetType.valueOf(it.key) }
+    }
+
+    fun adoptMultiplePets(pets: List<Pet>, ownerId: Long) {
+        if (pets.isEmpty()) throw BadRequestException("Pets cannot be empty")
+
+        val petIds = pets.map { it.id }
+
+        sql.update(petTable)
+            .set(petTable.ownerId, ownerId)
+            .where(petTable.id.`in`(petIds))
+            .execute()
+    }
+
+    fun createMultiplePets(pets: List<PetCreationRequest>){
+        if (pets.isEmpty()) throw BadRequestException("The pets list is empty")
+
+        val insert = sql.insertInto(petTable)
+            .columns(petTable.name, petTable.type, petTable.companyId, petTable.dateOfArrival, petTable.ownerId)
+            .values(
+                DSL.param(petTable.name),
+                DSL.param(petTable.type),
+                DSL.param(petTable.companyId),
+                DSL.param(petTable.dateOfArrival),
+                DSL.param(petTable.ownerId)
+            )
+        val batch = sql.batch(insert)
+        pets.forEach { batch.bind(it.name, it.type, it.companyId, it.arrivalDate, it.ownerId) }
+        batch.execute()
     }
 }
