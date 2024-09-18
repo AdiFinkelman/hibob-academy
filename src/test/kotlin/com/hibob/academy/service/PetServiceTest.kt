@@ -68,8 +68,8 @@ class PetServiceTest {
     fun `adopt multiple pets successfully`() {
         val companyId = 2L
         val newOwnerId = 1L
-        val adoptionRequest1 = AdoptionCreationRequest(1, companyId)
-        val adoptionRequest2 = AdoptionCreationRequest(2, companyId)
+        val adoptionRequest1 = AdoptionCreationRequest(1)
+        val adoptionRequest2 = AdoptionCreationRequest(2)
         val adoptionRequests = listOf(adoptionRequest1, adoptionRequest2)
         val multiAdoptionRequest = MultiAdoptionRequest(adoptionRequests, companyId, newOwnerId)
         val pet1 = Pet(1, "Tom", PetType.CAT, companyId, LocalDate.now(), 1)
