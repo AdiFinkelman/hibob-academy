@@ -75,9 +75,12 @@ class PetDao @Autowired constructor(private val sql: DSLContext) {
     }
 
     fun adoptMultiplePets(pets: List<Pet>, ownerId: Long) {
-        pets.forEach { pet ->
-            adoptPet(pet, ownerId)
-        }
+        val petIds = pets.map { it.id }
+
+        sql.update(petTable)
+            .set(petTable.ownerId, ownerId)
+            .where(petTable.id.`in`(petIds))
+            .execute()
     }
 
     fun createMultiplePets(pets: List<PetCreationRequest>){
