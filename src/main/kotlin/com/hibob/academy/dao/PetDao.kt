@@ -75,6 +75,8 @@ class PetDao @Autowired constructor(private val sql: DSLContext) {
     }
 
     fun adoptMultiplePets(pets: List<Pet>, ownerId: Long) {
+        if (pets.isEmpty()) throw BadRequestException("Pets cannot be empty")
+
         val petIds = pets.map { it.id }
 
         sql.update(petTable)

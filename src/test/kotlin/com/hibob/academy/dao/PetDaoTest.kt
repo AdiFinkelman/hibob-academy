@@ -171,9 +171,8 @@ class PetDaoTest @Autowired constructor(private val sql: DSLContext) {
     fun `adopt empty pets list`() {
         val ownerId = 3L
         val pets = emptyList<Pet>()
-        petDao.adoptMultiplePets(pets, ownerId)
-        val expectedResult = petDao.getAllPetsByCompanyId(companyId)
-        assertEquals(expectedResult, pets)
+        val expectedMessage = assertThrows<BadRequestException> { petDao.adoptMultiplePets(pets, ownerId) }
+        assertEquals("Pets cannot be empty", expectedMessage.message)
     }
 
     @BeforeEach
