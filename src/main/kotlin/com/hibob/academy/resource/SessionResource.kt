@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestBody
 
 @Controller
-@Path("/adi/usersession")
+@Path("/api/adi")
 class UserApi(private val service: SessionService) {
 
     @POST
@@ -20,6 +20,7 @@ class UserApi(private val service: SessionService) {
         val token = service.createJwtToken(user)
         val cookie = NewCookie.Builder(AuthenticationFilter.AUTH)
             .value(token)
+            .path("/api")
             .build()
 
         return Response.ok().cookie(cookie)
