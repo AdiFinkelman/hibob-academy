@@ -25,21 +25,19 @@ class AuthenticationFilter(private val sessionService: SessionService) : Contain
         }
         val token = requestContext.cookies[AUTH]?.value?.trim()
 
-        if (token.isNullOrEmpty())
-            unauthorizedUser(requestContext)
-
         verify(token, requestContext)
     }
 
     fun verify(token: String?, requestContext: ContainerRequestContext) {
-        token.let {
-            try {
-                Jwts.parserBuilder()
-                    .setSigningKey(sessionService.secretKey)
-                    .build()
-            } catch (e: Exception) {
-                    unauthorizedUser(requestContext)
-            }
+        if (token.isNullOrEmpty())
+            unauthorizedUser(requestContext)
+
+        try {
+            Jwts.parserBuilder()
+                .setSigningKey(sessionService.secretKey)
+                .build()
+        } catch (e: Exception) {
+            unauthorizedUser(requestContext)
         }
     }
 
