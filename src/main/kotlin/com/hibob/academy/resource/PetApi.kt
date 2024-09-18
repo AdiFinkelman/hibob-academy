@@ -16,7 +16,6 @@ import java.util.concurrent.CopyOnWriteArrayList
 @Consumes(MediaType.APPLICATION_JSON)
 class PetsResource(private val petService: PetService) {
 
-    private val companyId = 2L
     private val allPets: MutableList<Pet> = CopyOnWriteArrayList()
 
     @GET
@@ -32,7 +31,8 @@ class PetsResource(private val petService: PetService) {
     }
 
     @GET
-    fun getAllPets(): Response {
+    @Path("/company/{companyId}")
+    fun getAllPets(@PathParam("companyId") companyId: Long): Response {
         val pets = petService.getAllPetsByCompanyId(companyId)
         return Response.ok(pets).build()
     }

@@ -16,7 +16,6 @@ import java.util.concurrent.CopyOnWriteArrayList
 class OwnerResource(private val ownerService: OwnerService) {
 
     private val allOwners: MutableList<Owner> = CopyOnWriteArrayList()
-    private val companyId = 2L
 
     @GET
     @Path("/{ownerId}")
@@ -28,7 +27,8 @@ class OwnerResource(private val ownerService: OwnerService) {
     }
 
     @GET
-    fun getAllOwners(): Response {
+    @Path("/company/{companyId}")
+    fun getAllOwners(@PathParam("companyId") companyId: Long): Response {
         val owners = ownerService.getAllOwnersByCompanyId(companyId)
         return Response.ok(owners).build()
     }
@@ -42,7 +42,8 @@ class OwnerResource(private val ownerService: OwnerService) {
     }
 
     @POST
-    fun addOwner(ownerCreationRequest: OwnerCreationRequest): Response {
+    @Path("/company/{companyId}")
+    fun addOwner(@PathParam("companyId") companyId: Long, ownerCreationRequest: OwnerCreationRequest): Response {
         val (firstName, lastName) = extractFirstAndLastName(ownerCreationRequest)
         val newOwner =
             ownerCreationRequest.copy(name = "$firstName $lastName", firstName = firstName, lastName = lastName)
