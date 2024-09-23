@@ -10,6 +10,6 @@ CREATE TABLE employees (
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
     role VARCHAR(50) NOT NULL,
-    company_id INT REFERENCES company(id),
+    company_id BIGINT NOT NULL,
     department VARCHAR(255) NOT NULL
 );
