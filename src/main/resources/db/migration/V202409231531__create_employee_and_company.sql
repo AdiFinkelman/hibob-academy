@@ -9,7 +9,7 @@ CREATE TABLE employees (
     id BIGSERIAL PRIMARY KEY,
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
-    role VARCHAR(50) CHECK (role IN ('admin', 'HR', 'employee')) NOT NULL,
+    role VARCHAR(50) NOT NULL,
     company_id INT REFERENCES company(id),
     department VARCHAR(255) NOT NULL
 );
