@@ -2,8 +2,7 @@ CREATE TABLE feedback_configuration (
     id BIGSERIAL PRIMARY KEY,
     employee_id BIGINT NOT NULL,
     company_id BIGINT NOT NULL,
-    department VARCHAR(50) NOT NULL,
-    creation_date DATE DEFAULT CURRENT_DATE,
+    creation_time TIMESTAMP DEFAULT now(),
     is_anonymous BOOLEAN NOT NULL,
     status VARCHAR(50) NOT NULL
 );
