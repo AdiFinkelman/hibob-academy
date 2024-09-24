@@ -2,6 +2,7 @@ package com.hibob.project.dao
 
 import com.hibob.academy.utils.BobDbTest
 import org.jooq.DSLContext
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -63,6 +64,7 @@ class FeedbackDaoTest @Autowired constructor(private val sql: DSLContext) {
     }
 
     @BeforeEach
+    @AfterEach
     fun cleanup() {
         sql.delete(feedbackTable)
             .where(feedbackTable.companyId.eq(companyIdTest))
