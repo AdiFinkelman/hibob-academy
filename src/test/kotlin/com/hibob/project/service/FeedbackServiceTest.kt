@@ -1,7 +1,6 @@
 package com.hibob.project.service
 
 import com.hibob.project.dao.*
-import jakarta.ws.rs.NotFoundException
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.Test
@@ -9,7 +8,6 @@ import org.mockito.Mockito.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.sql.Timestamp
-import java.time.LocalDate
 import java.time.LocalDateTime
 
 class FeedbackServiceTest {
@@ -18,9 +16,8 @@ class FeedbackServiceTest {
     val companyIdTest = 1234L
 
     @Test
-    fun `get all feedbacks where feedback list is empty and throws exception`() {
-        val expectedMessage = assertThrows<NotFoundException> { feedbackService.getAllFeedbacks(companyIdTest) }
-        assertEquals("There are no feedbacks for this company", expectedMessage.message)
+    fun `get all feedbacks where feedback list is empty`() {
+        assertEquals(emptyList<FeedbackCreationRequest>(), feedbackService.getAllFeedbacks(companyIdTest))
     }
 
     @Test
@@ -36,7 +33,15 @@ class FeedbackServiceTest {
         val employee = Employee(1, "Adi", "Finkelman", Role.EMPLOYEE, companyIdTest, "Development")
         val feedbackCreationRequest = FeedbackCreationRequest("a", Timestamp.valueOf(LocalDateTime.now()), false, StatusType.UNREVIEWED)
         val expectedMessage = assertThrows<IllegalArgumentException> { feedbackService.feedbackSubmission(feedbackCreationRequest, employee) }
-        assertEquals("Title must be at least 2 characters", expectedMessage.message)
+        assertEquals("Text must be at least 2 characters", expectedMessage.message)
+    }
+
+    @Test
+    fun `feedback submission with string length greater than 100`() {
+        val employee = Employee(1, "Adi", "Finkelman", Role.EMPLOYEE, companyIdTest, "Development")
+        val feedbackCreationRequest = FeedbackCreationRequest("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", Timestamp.valueOf(LocalDateTime.now()), false, StatusType.UNREVIEWED)
+        val expectedMessage = assertThrows<IllegalArgumentException> { feedbackService.feedbackSubmission(feedbackCreationRequest, employee) }
+        assertEquals("Text must not exceed 100 characters", expectedMessage.message)
     }
 
     @Test
