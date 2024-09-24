@@ -29,7 +29,7 @@ class FeedbackDaoTest @Autowired constructor(private val sql: DSLContext) {
     }
 
     @Test
-    fun `submit multiple feedbacks and get all feedback successfully`() {
+    fun `submit multiple feedbacks and get all feedbacks successfully`() {
         val feedbackCreation1 = FeedbackCreationRequest("Complaint", Timestamp.valueOf(LocalDateTime.now()), false, StatusType.UNREVIEWED)
         val feedbackCreation2 = FeedbackCreationRequest("Regards", Timestamp.valueOf(LocalDateTime.now()), false, StatusType.UNREVIEWED)
         val feedBackId1 = feedbackDao.feedbackSubmission(feedbackCreation1, userTest)
@@ -40,15 +40,22 @@ class FeedbackDaoTest @Autowired constructor(private val sql: DSLContext) {
     }
 
     @Test
+    fun `submit anonymous feedback successfully`() {
+        val feedbackCreation = FeedbackCreationRequest("Anonymous", Timestamp.valueOf(LocalDateTime.now()), true, StatusType.UNREVIEWED)
+        val feedbackId = feedbackDao.feedbackSubmission(feedbackCreation, userTest)
+        val feedback = feedbackCreation.extractToFeedbackConfiguration(feedbackId, userTest.id, userTest.companyId)
+        assertTrue(feedbackDao.getAllFeedbacks(companyIdTest)[0].isAnonymous)
+    }
+
+    @Test
     fun `get all feedbacks where list is empty and throws exception`() {
-        val expectedMessage = assertThrows<NotFoundException> { feedbackDao.getAllFeedbacks(companyIdTest) }
-        assertEquals("List of feedbacks for companyId=$companyIdTest not found", expectedMessage.message)
+        val feedbacks = emptyList<FeedbackConfiguration>()
+        assertEquals(feedbacks, feedbackDao.getAllFeedbacks(companyIdTest))
     }
 
     @BeforeEach
-    @AfterEach
     fun cleanup() {
-        sql.deleteFrom(feedbackTable)
+        sql.delete(feedbackTable)
             .where(feedbackTable.companyId.eq(companyIdTest))
             .execute()
     }

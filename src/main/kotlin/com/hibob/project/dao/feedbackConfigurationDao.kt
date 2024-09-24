@@ -25,18 +25,11 @@ class FeedbackDao @Autowired constructor(private val sql: DSLContext) {
         )
     }
 
-    fun getAllFeedbacks(companyId: Long): List<FeedbackConfiguration> {
-        val feedbacks = sql.select(feedbackTable.id, feedbackTable.employeeId, feedbackTable.companyId, feedbackTable.title, feedbackTable.creationTime, feedbackTable.isAnonymous, feedbackTable.status)
+    fun getAllFeedbacks(companyId: Long): List<FeedbackConfiguration> =
+        sql.select(feedbackTable.id, feedbackTable.employeeId, feedbackTable.companyId, feedbackTable.title, feedbackTable.creationTime, feedbackTable.isAnonymous, feedbackTable.status)
             .from(feedbackTable)
             .where(feedbackTable.companyId.eq(companyId))
             .fetch(feedbackConfigurationMapper)
-
-        if (feedbacks.isEmpty()) {
-            throw NotFoundException("List of feedbacks for companyId=$companyId not found")
-        }
-
-        return feedbacks
-    }
 
     fun feedbackSubmission(feedbackCreationRequest: FeedbackCreationRequest, employee: Employee): Long {
         return sql.insertInto(feedbackTable)
@@ -50,7 +43,7 @@ class FeedbackDao @Autowired constructor(private val sql: DSLContext) {
             .fetchOne()!![feedbackTable.id]
     }
 
-    fun deleteFeedbackConfiguration(feedbackConfigurationId: Long) {
+    fun deleteCompanyFeedbacks(feedbackConfigurationId: Long) {
         sql.deleteFrom(feedbackTable)
             .where(feedbackTable.id.eq(feedbackConfigurationId))
             .execute()
