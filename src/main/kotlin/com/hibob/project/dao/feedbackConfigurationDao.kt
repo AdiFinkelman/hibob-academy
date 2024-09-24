@@ -8,11 +8,9 @@ import org.springframework.stereotype.Component
 
 @Component
 class FeedbackDao @Autowired constructor(private val sql: DSLContext) {
-
     private val feedbackTable = FeedbackConfigurationTable.instance
 
-    private val feedbackConfigurationMapper = RecordMapper<Record, FeedbackConfiguration>
-    { record ->
+    private val feedbackConfigurationMapper = RecordMapper<Record, FeedbackConfiguration> { record ->
         FeedbackConfiguration(
             id = record[feedbackTable.id],
             employeeId = record[feedbackTable.employeeId],

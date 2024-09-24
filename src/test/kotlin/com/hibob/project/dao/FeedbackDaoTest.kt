@@ -21,7 +21,7 @@ class FeedbackDaoTest @Autowired constructor(private val sql: DSLContext) {
     fun `submit feedback successfully`() {
         val feedbackCreation = FeedbackCreationRequest("Complaint", Timestamp.valueOf(LocalDateTime.now()), false, StatusType.UNREVIEWED)
         val feedbackId = feedbackDao.feedbackSubmission(feedbackCreation, userTest)
-        val feedback = feedbackCreation.toFeedbackConfiguration(feedbackId, userTest.id, userTest.companyId)
+        val feedback = extractToFeedbackConfiguration(feedbackCreation, feedbackId, userTest.id, userTest.companyId)
         assertEquals(listOf(feedback), feedbackDao.getAllFeedbacks(companyIdTest))
     }
 
@@ -31,8 +31,8 @@ class FeedbackDaoTest @Autowired constructor(private val sql: DSLContext) {
         val feedbackCreation2 = FeedbackCreationRequest("Regards", Timestamp.valueOf(LocalDateTime.now()), false, StatusType.UNREVIEWED)
         val feedBackId1 = feedbackDao.feedbackSubmission(feedbackCreation1, userTest)
         val feedBackId2 = feedbackDao.feedbackSubmission(feedbackCreation2, userTest)
-        val feedback1 = feedbackCreation1.toFeedbackConfiguration(feedBackId1, userTest.id, userTest.companyId)
-        val feedback2 = feedbackCreation2.toFeedbackConfiguration(feedBackId2, userTest.id, userTest.companyId)
+        val feedback1 = extractToFeedbackConfiguration(feedbackCreation1, feedBackId1, userTest.id, userTest.companyId)
+        val feedback2 = extractToFeedbackConfiguration(feedbackCreation2, feedBackId2, userTest.id, userTest.companyId)
         assertEquals(listOf(feedback1, feedback2), feedbackDao.getAllFeedbacks(companyIdTest))
     }
 
@@ -44,9 +44,22 @@ class FeedbackDaoTest @Autowired constructor(private val sql: DSLContext) {
     }
 
     @Test
-    fun `get all feedbacks where list is empty and throws exception`() {
+    fun `get all feedbacks where list is empty`() {
         val feedbacks = emptyList<FeedbackConfiguration>()
         assertEquals(feedbacks, feedbackDao.getAllFeedbacks(companyIdTest))
+    }
+
+    private fun extractToFeedbackConfiguration(feedbackCreationRequest: FeedbackCreationRequest, id: Long, employeeId: Long, companyId: Long): FeedbackConfiguration {
+        val feedbackConfiguration = FeedbackConfiguration(
+            id = id,
+            employeeId = employeeId,
+            companyId = companyId,
+            text = feedbackCreationRequest.text,
+            creationTime = feedbackCreationRequest.creationTime,
+            isAnonymous = feedbackCreationRequest.isAnonymous,
+            status = feedbackCreationRequest.status
+        )
+        return feedbackConfiguration
     }
 
     @BeforeEach

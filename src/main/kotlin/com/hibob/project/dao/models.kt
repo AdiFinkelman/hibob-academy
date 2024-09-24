@@ -17,20 +17,7 @@ data class FeedbackCreationRequest(
     val creationTime: Timestamp,
     val isAnonymous: Boolean,
     val status: StatusType
-) {
-    fun toFeedbackConfiguration(id: Long, employeeId: Long, companyId: Long): FeedbackConfiguration {
-        val feedbackConfiguration = FeedbackConfiguration(
-            id = id,
-            employeeId = employeeId,
-            companyId = companyId,
-            text = this.text,
-            creationTime = this.creationTime,
-            isAnonymous = this.isAnonymous,
-            status = this.status
-        )
-        return feedbackConfiguration
-    }
-}
+)
 
 data class Comment(
     val id: Long,
@@ -49,7 +36,7 @@ enum class StatusType {
     REVIEWED, UNREVIEWED
 }
 
-enum class Role() {
+enum class Role {
     ADMIN, HR, EMPLOYEE
 }
 
