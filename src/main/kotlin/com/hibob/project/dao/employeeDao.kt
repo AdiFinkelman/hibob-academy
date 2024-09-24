@@ -21,7 +21,7 @@ class EmployeeDao(private val sql: DSLContext) {
         )
     }
 
-    fun getEmployee(loginEmployeeRequest: LoginEmployeeRequest): Employee? {
+    fun getEmployee(loginEmployeeRequest: LoginEmployeeRequest): Employee {
         return sql.select(
             employeeTable.id,
             employeeTable.firstName,
