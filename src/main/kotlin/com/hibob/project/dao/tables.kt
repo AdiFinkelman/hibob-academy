@@ -2,10 +2,11 @@ package com.hibob.project.dao
 
 import com.hibob.academy.utils.JooqTable
 
-class FeedbackConfigurationTable(tableName: String = "feedback_configuration") : JooqTable(tableName) {
+class FeedbackConfigurationTable(tableName: String = "feedback") : JooqTable(tableName) {
     val id = createBigIntField("id")
     val employeeId = createBigIntField("employee_id")
     val companyId = createBigIntField("company_id")
+    val title = createVarcharField("title")
     val creationTime = createTimestampField("creation_time")
     val isAnonymous = createBooleanField("is_anonymous")
     val status = createVarcharField("status")
@@ -15,7 +16,7 @@ class FeedbackConfigurationTable(tableName: String = "feedback_configuration") :
     }
 }
 
-class FeedbackCommentTable(tableName: String = "feedback_comment") : JooqTable(tableName) {
+class CommentTable(tableName: String = "comment") : JooqTable(tableName) {
     val id = createBigIntField("id")
     val employeeId = createBigIntField("employee_id")
     val text = createVarcharField("text")
@@ -23,7 +24,7 @@ class FeedbackCommentTable(tableName: String = "feedback_comment") : JooqTable(t
     val creationTime = createTimestampField("creation_time")
 
     companion object {
-        val instance = FeedbackCommentTable()
+        val instance = CommentTable()
     }
 }
 
