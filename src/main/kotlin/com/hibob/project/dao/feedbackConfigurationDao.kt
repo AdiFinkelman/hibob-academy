@@ -1,6 +1,5 @@
 package com.hibob.project.dao
 
-import com.hibob.bootcamp.Employee
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.RecordMapper
@@ -24,9 +23,11 @@ class FeedbackConfigurationDao @Autowired constructor(private val sql: DSLContex
         )
     }
 
-    fun getFeedbackConfiguration(employee: Employee): FeedbackConfiguration {
+    fun getAllFeedbacks(companyId: Long): List<FeedbackConfiguration> =
         sql.select(feedbackTable.id, feedbackTable.employeeId, feedbackTable.companyId, feedbackTable.creationTime, feedbackTable.isAnonymous, feedbackTable.status)
-        .from(feedbackTable)
-            .where(feedbackTable.name.eq(employee.name))
-    }
+            .from(feedbackTable)
+            .where(feedbackTable.companyId.eq(companyId))
+            .fetch(feedbackConfigurationMapper)
+
+//    fun createFeedbackConfiguration(feedbackConfiguration: FeedbackConfiguration): FeedbackConfiguration {}
 }
