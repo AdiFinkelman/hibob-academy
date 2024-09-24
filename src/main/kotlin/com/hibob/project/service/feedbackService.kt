@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component
 
 @Component
 class FeedbackService @Autowired constructor(private val feedbackDao: FeedbackDao) {
-
     fun getAllFeedbacks(companyId: Long): List<FeedbackConfiguration> {
         val feedbacks = feedbackDao.getAllFeedbacks(companyId)
 
@@ -18,7 +17,7 @@ class FeedbackService @Autowired constructor(private val feedbackDao: FeedbackDa
     }
 
     fun feedbackSubmission(feedbackCreationRequest: FeedbackCreationRequest, employee: Employee) {
-        if (feedbackCreationRequest.title.length < 2)
+        if (feedbackCreationRequest.text.length < 2)
             throw IllegalArgumentException("Title must be at least 2 characters")
 
         feedbackDao.feedbackSubmission(feedbackCreationRequest, employee)

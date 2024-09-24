@@ -13,7 +13,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 class FeedbackServiceTest {
-
     private val feedbackDao = mock<FeedbackDao>()
     private val feedbackService = FeedbackService(feedbackDao)
     val companyIdTest = 1234L
