@@ -20,7 +20,7 @@ class FeedbackDaoTest @Autowired constructor(private val sql: DSLContext) {
 
     @Test
     fun `submit feedback successfully`() {
-        val feedbackCreation = FeedbackCreationRequest("Complaint", Timestamp.valueOf(LocalDateTime.now()), false, StatusType.UNREVIEWED)
+        val feedbackCreation = FeedbackCreationRequest("Complaint", Timestamp.valueOf(LocalDateTime.now().withNano(0)), false, StatusType.UNREVIEWED)
         val feedbackId = feedbackDao.feedbackSubmission(feedbackCreation, userTest)
         val feedback = extractToFeedbackConfiguration(feedbackCreation, feedbackId, userTest.id, userTest.companyId)
         assertEquals(listOf(feedback), feedbackDao.getAllFeedbacks(companyIdTest))
@@ -28,8 +28,8 @@ class FeedbackDaoTest @Autowired constructor(private val sql: DSLContext) {
 
     @Test
     fun `submit multiple feedbacks and get all feedbacks successfully`() {
-        val feedbackCreation1 = FeedbackCreationRequest("Complaint", Timestamp.valueOf(LocalDateTime.now()), false, StatusType.UNREVIEWED)
-        val feedbackCreation2 = FeedbackCreationRequest("Regards", Timestamp.valueOf(LocalDateTime.now()), false, StatusType.UNREVIEWED)
+        val feedbackCreation1 = FeedbackCreationRequest("Complaint", Timestamp.valueOf(LocalDateTime.now().withNano(0)), false, StatusType.UNREVIEWED)
+        val feedbackCreation2 = FeedbackCreationRequest("Regards", Timestamp.valueOf(LocalDateTime.now().withNano(0)), false, StatusType.UNREVIEWED)
         val feedBackId1 = feedbackDao.feedbackSubmission(feedbackCreation1, userTest)
         val feedBackId2 = feedbackDao.feedbackSubmission(feedbackCreation2, userTest)
         val feedback1 = extractToFeedbackConfiguration(feedbackCreation1, feedBackId1, userTest.id, userTest.companyId)
