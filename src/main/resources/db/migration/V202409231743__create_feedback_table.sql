@@ -8,7 +8,7 @@ CREATE TABLE feedback (
     status VARCHAR(50) NOT NULL
 );
 
-CREATE TABLE response (
+CREATE TABLE comment (
     id BIGSERIAL PRIMARY KEY,
     employee_id BIGINT NOT NULL,
     text TEXT NOT NULL,
