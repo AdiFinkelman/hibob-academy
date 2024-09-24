@@ -23,7 +23,15 @@ class FeedbackDao @Autowired constructor(private val sql: DSLContext) {
     }
 
     fun getAllFeedbacks(companyId: Long): List<FeedbackConfiguration> =
-        sql.select(feedbackTable.id, feedbackTable.employeeId, feedbackTable.companyId, feedbackTable.text, feedbackTable.creationTime, feedbackTable.isAnonymous, feedbackTable.status)
+        sql.select(
+            feedbackTable.id,
+            feedbackTable.employeeId,
+            feedbackTable.companyId,
+            feedbackTable.text,
+            feedbackTable.creationTime,
+            feedbackTable.isAnonymous,
+            feedbackTable.status
+        )
             .from(feedbackTable)
             .where(feedbackTable.companyId.eq(companyId))
             .fetch(feedbackConfigurationMapper)
