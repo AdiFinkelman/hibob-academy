@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component
 class AuthenticationFilter(private val sessionService: SessionService) : ContainerRequestFilter {
 
     companion object {
-        const val LOGIN_PATH = "api/adi/login"
+        const val LOGIN_PATH = "api/system/login"
         const val AUTH = "Authorization"
     }
 

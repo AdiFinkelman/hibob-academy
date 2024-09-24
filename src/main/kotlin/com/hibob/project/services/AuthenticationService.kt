@@ -22,6 +22,7 @@ class AuthenticationService {
             .setHeaderParam("typ", "JWT")
             .claim("employeeId", user.id)
             .claim("companyId", user.companyId)
+            .claim("role", user.role)
             .setIssuedAt(now)
             .setExpiration(Date(System.currentTimeMillis() + ONE_DAY_MILLIS))
             .signWith(SignatureAlgorithm.HS256, secretKey)

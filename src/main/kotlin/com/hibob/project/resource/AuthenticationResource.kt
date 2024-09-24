@@ -29,9 +29,4 @@ class UserApi(private val service: AuthenticationService) {
     }
 }
 
-data class User
-    (
-    val email: String, val username: String, val isAdmin: Boolean,
-)
-
 

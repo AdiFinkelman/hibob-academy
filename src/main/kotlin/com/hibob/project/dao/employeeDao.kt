@@ -15,7 +15,6 @@ class EmployeeDao (private val sql: DSLContext) {
         LoginEmployeeRequest(
             id = record[employeeTable.id],
             companyId = record[employeeTable.companyId],
-            role = enumValueOf<Role>(record[employeeTable.role])
         )
     }
 
