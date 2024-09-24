@@ -35,17 +35,4 @@ class AuthenticationService(private val employeeDao: EmployeeDao) {
     fun getEmployee(loginEmployeeRequest: LoginEmployeeRequest): Employee? {
         return employeeDao.getEmployee(loginEmployeeRequest)
     }
-
-    fun getEmployeeFromToken(token: String): Employee {
-        val claims = Jwts.parserBuilder()
-            .setSigningKey(secretKey)
-            .build()
-            .parseClaimsJws(token)
-            .body
-
-        val employeeId = claims["employeeId"] as Long
-        val companyId = claims["companyId"] as Long
-
-        return employeeDao.getEmployee(LoginEmployeeRequest(employeeId, companyId))
-    }
 }
