@@ -18,7 +18,7 @@ data class FeedbackCreationRequest(
     val isAnonymous: Boolean,
     val status: StatusType
 ) {
-    fun extractToFeedbackConfiguration(id: Long, employeeId: Long, companyId: Long): FeedbackConfiguration {
+    fun toFeedbackConfiguration(id: Long, employeeId: Long, companyId: Long): FeedbackConfiguration {
         val feedbackConfiguration = FeedbackConfiguration(
             id = id,
             employeeId = employeeId,
