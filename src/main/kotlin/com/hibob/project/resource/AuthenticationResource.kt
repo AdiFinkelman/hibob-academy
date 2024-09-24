@@ -1,6 +1,8 @@
 package com.hibob.project.resource
 
 import com.hibob.academy.filters.AuthenticationFilter
+import com.hibob.project.dao.Employee
+import com.hibob.project.dao.EmployeeDao
 import com.hibob.project.dao.LoginEmployeeRequest
 import com.hibob.project.services.AuthenticationService
 import jakarta.ws.rs.*
@@ -12,13 +14,13 @@ import org.springframework.web.bind.annotation.RequestBody
 
 @Controller
 @Path("/api/system")
-class UserApi(private val service: AuthenticationService) {
-
+class AuthenticationResource(private val service: AuthenticationService) {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/login")
     fun userAuthenticate(@RequestBody loginEmployeeRequest: LoginEmployeeRequest): Response {
-        val token = service.createJwtToken(loginEmployeeRequest)
+        val employee = service.getEmployee(loginEmployeeRequest)
+        val token = service.createJwtToken(employee)
         val cookie = NewCookie.Builder(AuthenticationFilter.AUTH)
             .value(token)
             .path("/api")

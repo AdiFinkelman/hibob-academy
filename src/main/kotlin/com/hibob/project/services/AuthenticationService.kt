@@ -1,5 +1,7 @@
 package com.hibob.project.services
 
+import com.hibob.project.dao.Employee
+import com.hibob.project.dao.EmployeeDao
 import com.hibob.project.dao.LoginEmployeeRequest
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
@@ -11,21 +13,23 @@ import java.util.*
 const val ONE_DAY_MILLIS = 60 * 60 * 24
 
 @Component
-class AuthenticationService {
-
+class AuthenticationService(private val employeeDao: EmployeeDao) {
     companion object val secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
     val now = Date.from(Instant.now())
 
-    fun createJwtToken(user: LoginEmployeeRequest): String {
+    fun createJwtToken(employee: Employee?): String {
 
         return Jwts.builder()
             .setHeaderParam("typ", "JWT")
-            .claim("employeeId", user.id)
-            .claim("companyId", user.companyId)
-            .claim("role", user.role)
+            .claim("employeeId", employee?.id)
+            .claim("companyId", employee?.companyId)
+            .claim("role", employee?.role)
             .setIssuedAt(now)
             .setExpiration(Date(System.currentTimeMillis() + ONE_DAY_MILLIS))
             .signWith(SignatureAlgorithm.HS256, secretKey)
             .compact()
     }
+
+    fun getEmployee(loginEmployeeRequest: LoginEmployeeRequest) =
+        employeeDao.getEmployee(loginEmployeeRequest)
 }
