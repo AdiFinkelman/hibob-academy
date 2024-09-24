@@ -41,9 +41,9 @@ class AuthenticationFilter(private val authService: AuthenticationService) : Con
                 .build()
                 .parseClaimsJws(token).body
 
-            val employeeId = claims["employeeId"] as? Long
-            val companyId = claims["companyId"] as? String
-            val role = claims["role"] as? Role
+            val employeeId = (claims["employeeId"] as? Int)?.toLong()
+            val companyId = (claims["companyId"] as? Int)?.toLong()
+            val role = enumValueOf<Role>(claims["role"] as String)
 
             requestContext.setProperty("employeeId", employeeId)
             requestContext.setProperty("companyId", companyId)
