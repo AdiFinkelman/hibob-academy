@@ -2,7 +2,7 @@ package com.hibob.academy.dao
 
 import jakarta.ws.rs.BadRequestException
 import org.jooq.DSLContext
-    import org.jooq.Record
+import org.jooq.Record
 import org.jooq.RecordMapper
 import org.jooq.impl.DSL
 import org.springframework.beans.factory.annotation.Autowired
