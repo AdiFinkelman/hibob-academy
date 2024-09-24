@@ -1,10 +1,8 @@
 package com.hibob.project.resource
 
 import com.hibob.academy.filters.AuthenticationFilter
-import com.hibob.project.dao.Employee
-import com.hibob.project.dao.EmployeeDao
 import com.hibob.project.dao.LoginEmployeeRequest
-import com.hibob.project.services.AuthenticationService
+import com.hibob.project.service.AuthenticationService
 import jakarta.ws.rs.*
 import jakarta.ws.rs.core.MediaType
 import jakarta.ws.rs.core.NewCookie

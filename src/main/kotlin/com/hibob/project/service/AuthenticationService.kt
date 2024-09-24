@@ -1,4 +1,4 @@
-package com.hibob.project.services
+package com.hibob.project.service
 
 import com.hibob.project.dao.Employee
 import com.hibob.project.dao.EmployeeDao
