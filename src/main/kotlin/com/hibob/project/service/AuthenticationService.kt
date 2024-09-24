@@ -14,7 +14,9 @@ const val ONE_DAY_MILLIS = 60 * 60 * 24
 
 @Component
 class AuthenticationService(private val employeeDao: EmployeeDao) {
-    companion object val secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
+    companion object
+
+    val secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
     val now = Date.from(Instant.now())
 
     fun createJwtToken(employee: Employee?): String {
@@ -26,10 +28,24 @@ class AuthenticationService(private val employeeDao: EmployeeDao) {
             .claim("role", employee?.role)
             .setIssuedAt(now)
             .setExpiration(Date(System.currentTimeMillis() + ONE_DAY_MILLIS))
-            .signWith(SignatureAlgorithm.HS256, secretKey)
+            .signWith(secretKey)
             .compact()
     }
 
-    fun getEmployee(loginEmployeeRequest: LoginEmployeeRequest) =
-        employeeDao.getEmployee(loginEmployeeRequest)
+    fun getEmployee(loginEmployeeRequest: LoginEmployeeRequest): Employee? {
+        return employeeDao.getEmployee(loginEmployeeRequest)
+    }
+
+    fun getEmployeeFromToken(token: String): Employee? {
+        val claims = Jwts.parserBuilder()
+            .setSigningKey(secretKey)
+            .build()
+            .parseClaimsJws(token)
+            .body
+
+        val employeeId = claims["employeeId"] as Long
+        val companyId = claims["companyId"] as Long
+
+        return employeeDao.getEmployee(LoginEmployeeRequest(employeeId, companyId))
+    }
 }
