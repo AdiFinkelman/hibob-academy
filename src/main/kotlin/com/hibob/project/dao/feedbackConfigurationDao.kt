@@ -1,6 +1,5 @@
 package com.hibob.project.dao
 
-import jakarta.ws.rs.NotFoundException
 import org.jooq.DSLContext
 import org.jooq.Record
 import org.jooq.RecordMapper
@@ -18,7 +17,7 @@ class FeedbackDao @Autowired constructor(private val sql: DSLContext) {
             id = record[feedbackTable.id],
             employeeId = record[feedbackTable.employeeId],
             companyId = record[feedbackTable.companyId],
-            title = record[feedbackTable.title],
+            text = record[feedbackTable.text],
             creationTime = record[feedbackTable.creationTime],
             isAnonymous = record[feedbackTable.isAnonymous],
             status = enumValueOf(record[feedbackTable.status])
@@ -26,7 +25,7 @@ class FeedbackDao @Autowired constructor(private val sql: DSLContext) {
     }
 
     fun getAllFeedbacks(companyId: Long): List<FeedbackConfiguration> =
-        sql.select(feedbackTable.id, feedbackTable.employeeId, feedbackTable.companyId, feedbackTable.title, feedbackTable.creationTime, feedbackTable.isAnonymous, feedbackTable.status)
+        sql.select(feedbackTable.id, feedbackTable.employeeId, feedbackTable.companyId, feedbackTable.text, feedbackTable.creationTime, feedbackTable.isAnonymous, feedbackTable.status)
             .from(feedbackTable)
             .where(feedbackTable.companyId.eq(companyId))
             .fetch(feedbackConfigurationMapper)
@@ -35,7 +34,7 @@ class FeedbackDao @Autowired constructor(private val sql: DSLContext) {
         return sql.insertInto(feedbackTable)
             .set(feedbackTable.employeeId, employee.id)
             .set(feedbackTable.companyId, employee.companyId)
-            .set(feedbackTable.title, feedbackCreationRequest.title)
+            .set(feedbackTable.text, feedbackCreationRequest.text)
             .set(feedbackTable.creationTime, feedbackCreationRequest.creationTime)
             .set(feedbackTable.isAnonymous, feedbackCreationRequest.isAnonymous)
             .set(feedbackTable.status, feedbackCreationRequest.status.name)

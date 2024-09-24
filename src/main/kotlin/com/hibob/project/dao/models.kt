@@ -6,14 +6,14 @@ data class FeedbackConfiguration(
     val id: Long,
     val employeeId: Long,
     val companyId: Long,
-    val title: String,
+    val text: String,
     val creationTime: Timestamp,
     val isAnonymous: Boolean,
     val status: StatusType
 )
 
 data class FeedbackCreationRequest(
-    val title: String,
+    val text: String,
     val creationTime: Timestamp,
     val isAnonymous: Boolean,
     val status: StatusType
@@ -23,7 +23,7 @@ data class FeedbackCreationRequest(
             id = id,
             employeeId = employeeId,
             companyId = companyId,
-            title = this.title,
+            text = this.text,
             creationTime = this.creationTime,
             isAnonymous = this.isAnonymous,
             status = this.status
