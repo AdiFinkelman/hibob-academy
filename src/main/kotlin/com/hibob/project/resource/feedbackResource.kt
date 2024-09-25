@@ -16,7 +16,11 @@ import org.springframework.stereotype.Controller
 class FeedbackResource(private val feedbackService: FeedbackService) {
     @GET
     @Path("/{companyId}")
-    fun getAllFeedbacks(@PathParam("companyId") companyId: Long) = feedbackService.getAllFeedbacks(companyId)
+    fun getAllFeedbacks(@PathParam("companyId") companyId: Long): Response {
+        feedbackService.getAllFeedbacks(companyId)
+
+        return Response.ok().build()
+    }
 
     @POST
     fun feedbackSubmission(@Context requestContext: ContainerRequestContext, feedbackCreationRequest: FeedbackCreationRequest): Response {
