@@ -1,14 +1,15 @@
 package com.hibob.project.dao
 
-import org.jooq.DSLContext
-import org.jooq.Record
-import org.jooq.RecordMapper
+import org.jooq.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import java.sql.Timestamp
+import java.time.LocalDateTime
 
 @Component
 class FeedbackDao @Autowired constructor(private val sql: DSLContext) {
     private val feedbackTable = FeedbackConfigurationTable.instance
+    private val employeeTable = EmployeesTable.instance
 
     private val feedbackConfigurationMapper = RecordMapper<Record, FeedbackConfiguration> { record ->
         FeedbackConfiguration(
@@ -41,11 +42,62 @@ class FeedbackDao @Autowired constructor(private val sql: DSLContext) {
             .set(feedbackTable.employeeId, employee.id)
             .set(feedbackTable.companyId, employee.companyId)
             .set(feedbackTable.text, feedbackCreationRequest.text)
-            .set(feedbackTable.creationTime, feedbackCreationRequest.creationTime)
+            .set(feedbackTable.creationTime, Timestamp.valueOf(LocalDateTime.now().withNano(0)))
             .set(feedbackTable.isAnonymous, feedbackCreationRequest.isAnonymous)
             .set(feedbackTable.status, feedbackCreationRequest.status.name)
             .returning(feedbackTable.id)
             .fetchOne()!![feedbackTable.id]
+    }
+
+    fun getFeedbacksByFilter(companyId: Long, filterOption: FilterOption): List<FeedbackConfiguration> {
+        val query = sql.select(
+            feedbackTable.id,
+            feedbackTable.employeeId,
+            feedbackTable.companyId,
+            feedbackTable.text,
+            feedbackTable.creationTime,
+            feedbackTable.isAnonymous,
+            feedbackTable.status
+        )
+            .from(feedbackTable)
+            .join(employeeTable).on(feedbackTable.employeeId.eq(employeeTable.id))
+            .where(feedbackTable.companyId.eq(companyId))
+
+        dateFilter(query, filterOption)
+        departmentFilter(query, filterOption)
+        anonymityStatusFilter(query, filterOption)
+        statusFilter(query, filterOption)
+
+        return query.fetch(feedbackConfigurationMapper)
+    }
+
+    private fun dateFilter(query: SelectConditionStep<*>, filterOption: FilterOption) {
+        filterOption.date?.let {
+            query.and(
+                feedbackTable.creationTime.between(
+                    Timestamp.valueOf(it.atStartOfDay()),
+                    Timestamp.valueOf(it.plusDays(1).atStartOfDay())
+                )
+            )
+        }
+    }
+
+    private fun departmentFilter(query: SelectConditionStep<*>, filterOption: FilterOption) {
+        filterOption.department?.let {
+            query.and(employeeTable.department.eq(filterOption.department))
+        }
+    }
+
+    private fun anonymityStatusFilter(query: SelectConditionStep<*>, filterOption: FilterOption) {
+        filterOption.anonymityStatus?.let {
+            query.and(feedbackTable.isAnonymous.eq(filterOption.anonymityStatus))
+        }
+    }
+
+    private fun statusFilter(query: SelectConditionStep<*>, filterOption: FilterOption) {
+        filterOption.status?.let {
+            query.and(feedbackTable.status.eq(it.name))
+        }
     }
 
     fun deleteCompanyFeedbacks(feedbackConfigurationId: Long) {
