@@ -15,7 +15,7 @@ class CommentDaoTest @Autowired constructor(private val sql: DSLContext) {
     private val feedbackDao = FeedbackDao(sql)
     private val commentTable = CommentTable.instance
     private val feedbackTable = FeedbackConfigurationTable.instance
-    private val userTest = Employee(1, "Adi", "Finkelman", Role.EMPLOYEE, 1234L, "development")
+    private val userTest = LoginEmployeeResponse(1, 1234L, Role.EMPLOYEE)
     private val feedbackCreation = FeedbackCreationRequest("Complaint", Timestamp.valueOf(LocalDateTime.now().withNano(0)), false, StatusType.UNREVIEWED)
     private val feedbackIdTest = feedbackDao.feedbackSubmission(feedbackCreation, userTest)
 
