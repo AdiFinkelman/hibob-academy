@@ -48,6 +48,22 @@ class FeedbackDao @Autowired constructor(private val sql: DSLContext) {
             .fetchOne()!![feedbackTable.id]
     }
 
+    fun markFeedbackStatus(feedbackConfiguration: FeedbackConfiguration, status: StatusType) {
+        sql.update(feedbackTable)
+            .set(feedbackTable.status, status.name)
+            .where(feedbackTable.id.eq(feedbackConfiguration.id))
+            .execute()
+    }
+
+    fun checkStatus(feedbackConfiguration: FeedbackConfiguration): StatusResponse {
+        val currentStatus = sql.select(feedbackTable.status)
+            .from(feedbackTable)
+            .where(feedbackTable.id.eq(feedbackConfiguration.id))
+            .fetchOne(feedbackTable.status)
+
+        return StatusResponse(enumValueOf(currentStatus.toString()))
+    }
+
     fun deleteCompanyFeedbacks(feedbackConfigurationId: Long) {
         sql.deleteFrom(feedbackTable)
             .where(feedbackTable.id.eq(feedbackConfigurationId))
