@@ -12,12 +12,14 @@ class FeedbackService @Autowired constructor(private val feedbackDao: FeedbackDa
     }
 
     fun feedbackSubmission(feedbackCreationRequest: FeedbackCreationRequest, employee: Employee) {
+        if (validateFeedback(feedbackCreationRequest)) { feedbackDao.feedbackSubmission(feedbackCreationRequest, employee) }
+    }
+
+    fun validateFeedback(feedbackCreationRequest: FeedbackCreationRequest): Boolean {
         if (feedbackCreationRequest.text.length < 2)
             throw IllegalArgumentException("Text must be at least 2 characters")
-
         else if (feedbackCreationRequest.text.length > 100)
             throw IllegalArgumentException("Text must not exceed 100 characters")
-
-        feedbackDao.feedbackSubmission(feedbackCreationRequest, employee)
+        return true
     }
 }
