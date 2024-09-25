@@ -1,6 +1,7 @@
 package com.hibob.project.dao
 
 import java.sql.Timestamp
+import java.time.LocalDate
 
 data class FeedbackConfiguration(
     val id: Long,
@@ -70,4 +71,10 @@ data class LoginEmployeeResponse(
     val id: Long,
     val companyId: Long,
     val role: Role
+)
+
+data class FilterOption(
+    val date: LocalDate? = null,
+    val department: String? = null,
+    val anonymityStatus: Boolean? = null
 )
