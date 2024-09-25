@@ -19,7 +19,8 @@ class FeedbackResource(private val feedbackService: FeedbackService) {
     @GET
     fun getAllFeedbacks(@Context requestContext: ContainerRequestContext): Response {
         val authenticatedEmployee = AuthenticationUtil.extractAuthenticatedEmployee(requestContext)
-        if (isRoleValidate(authenticatedEmployee.role)) {
+
+        if (isRoleValid(authenticatedEmployee.role)) {
             val feedbacks = feedbackService.getAllFeedbacks(authenticatedEmployee.companyId)
 
             return Response.ok(feedbacks).build()
@@ -38,7 +39,7 @@ class FeedbackResource(private val feedbackService: FeedbackService) {
         return Response.ok(feedbackCreationRequest).build()
     }
 
-    private fun isRoleValidate(role: Role): Boolean {
+    private fun isRoleValid(role: Role): Boolean {
         return (role == Role.ADMIN || role == Role.HR)
     }
 }
