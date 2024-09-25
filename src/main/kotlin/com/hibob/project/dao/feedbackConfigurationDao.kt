@@ -55,7 +55,7 @@ class FeedbackDao @Autowired constructor(private val sql: DSLContext) {
             .execute()
     }
 
-    fun checkStatus(feedbackConfiguration: FeedbackConfiguration, status: StatusType): StatusResponse {
+    fun checkStatus(feedbackConfiguration: FeedbackConfiguration): StatusResponse {
         val currentStatus = sql.select(feedbackTable.status)
             .from(feedbackTable)
             .where(feedbackTable.id.eq(feedbackConfiguration.id))

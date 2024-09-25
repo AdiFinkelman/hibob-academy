@@ -62,8 +62,11 @@ class FeedbackDaoTest @Autowired constructor(private val sql: DSLContext) {
     @Test
     fun `check status successfully`() {
         val feedbackCreation = FeedbackCreationRequest("Complaint", Timestamp.valueOf(LocalDateTime.now().withNano(0)), false, StatusType.UNREVIEWED)
+        val feedbackId = feedbackDao.feedbackSubmission(feedbackCreation, userTest)
+        val feedback = extractToFeedbackConfiguration(feedbackCreation, feedbackId, userTest.id, userTest.companyId)
         feedbackDao.feedbackSubmission(feedbackCreation, userTest)
-        assertEquals(StatusType.UNREVIEWED, feedbackDao.getAllFeedbacks(companyIdTest)[0].status)
+        val statusResponse = feedbackDao.checkStatus(feedback)
+        assertEquals(StatusType.UNREVIEWED, statusResponse.status)
     }
 
     private fun extractToFeedbackConfiguration(feedbackCreationRequest: FeedbackCreationRequest, id: Long, employeeId: Long, companyId: Long): FeedbackConfiguration {
