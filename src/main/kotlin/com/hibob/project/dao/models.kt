@@ -53,3 +53,14 @@ data class Employee(
     val companyId: Long,
     val department: String
 )
+
+data class LoginEmployeeRequest(
+    val id: Long,
+    val companyId: Long
+)
+
+data class LoginEmployeeResponse(
+    val id: Long,
+    val companyId: Long,
+    val role: Role
+)
