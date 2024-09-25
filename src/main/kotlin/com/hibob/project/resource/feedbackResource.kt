@@ -15,15 +15,19 @@ import org.springframework.stereotype.Controller
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 class FeedbackResource(private val feedbackService: FeedbackService) {
+
     @GET
     fun getAllFeedbacks(@Context requestContext: ContainerRequestContext): Response {
         val authenticatedEmployee = AuthenticationUtil.extractAuthenticatedEmployee(requestContext)
-        if (authenticatedEmployee.role == Role.ADMIN || authenticatedEmployee.role == Role.HR) {
+        if (isRoleValidate(authenticatedEmployee.role)) {
             val feedbacks = feedbackService.getAllFeedbacks(authenticatedEmployee.companyId)
+
             return Response.ok(feedbacks).build()
         }
 
-        return Response.ok().build()
+        return Response.status(Response.Status.UNAUTHORIZED)
+            .entity("Employee doesnt have permission")
+            .build()
     }
 
     @POST
@@ -32,5 +36,9 @@ class FeedbackResource(private val feedbackService: FeedbackService) {
         feedbackService.feedbackSubmission(feedbackCreationRequest, authenticatedEmployee)
 
         return Response.ok(feedbackCreationRequest).build()
+    }
+
+    private fun isRoleValidate(role: Role): Boolean {
+        return (role == Role.ADMIN || role == Role.HR)
     }
 }
