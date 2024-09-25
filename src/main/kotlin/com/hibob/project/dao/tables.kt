@@ -42,7 +42,7 @@ class EmployeesTable(tableName: String = "employees") : JooqTable(tableName) {
     val firstName = createVarcharField("first_name")
     val lastName = createVarcharField("last_name")
     val role = createVarcharField("role")
-    val companyId = createVarcharField("company_id")
+    val companyId = createBigIntField("company_id")
     val department = createVarcharField("department")
 
     companion object {

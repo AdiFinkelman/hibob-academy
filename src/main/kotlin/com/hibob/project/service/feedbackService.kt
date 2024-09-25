@@ -11,7 +11,7 @@ class FeedbackService @Autowired constructor(private val feedbackDao: FeedbackDa
         return feedbacks
     }
 
-    fun feedbackSubmission(feedbackCreationRequest: FeedbackCreationRequest, employee: Employee) {
+    fun feedbackSubmission(feedbackCreationRequest: FeedbackCreationRequest, employee: LoginEmployeeResponse) {
         if (validateFeedback(feedbackCreationRequest)) { feedbackDao.feedbackSubmission(feedbackCreationRequest, employee) }
     }
 

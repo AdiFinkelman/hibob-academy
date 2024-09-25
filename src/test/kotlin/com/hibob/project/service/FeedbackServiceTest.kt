@@ -30,7 +30,7 @@ class FeedbackServiceTest {
 
     @Test
     fun `feedback submission with string length smaller than 2`() {
-        val employee = Employee(1, "Adi", "Finkelman", Role.EMPLOYEE, companyIdTest, "Development")
+        val employee = LoginEmployeeResponse(1, companyIdTest, Role.EMPLOYEE)
         val feedbackCreationRequest = FeedbackCreationRequest("a", Timestamp.valueOf(LocalDateTime.now()), false, StatusType.UNREVIEWED)
         val expectedMessage = assertThrows<IllegalArgumentException> { feedbackService.feedbackSubmission(feedbackCreationRequest, employee) }
         assertEquals("Text must be at least 2 characters", expectedMessage.message)
@@ -38,7 +38,7 @@ class FeedbackServiceTest {
 
     @Test
     fun `feedback submission with string length greater than 100`() {
-        val employee = Employee(1, "Adi", "Finkelman", Role.EMPLOYEE, companyIdTest, "Development")
+        val employee = LoginEmployeeResponse(1, companyIdTest, Role.EMPLOYEE)
         val feedbackCreationRequest = FeedbackCreationRequest("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", Timestamp.valueOf(LocalDateTime.now()), false, StatusType.UNREVIEWED)
         val expectedMessage = assertThrows<IllegalArgumentException> { feedbackService.feedbackSubmission(feedbackCreationRequest, employee) }
         assertEquals("Text must not exceed 100 characters", expectedMessage.message)
@@ -46,7 +46,7 @@ class FeedbackServiceTest {
 
     @Test
     fun `feedback submission successfully`() {
-        val employee = Employee(1, "Adi", "Finkelman", Role.EMPLOYEE, companyIdTest, "Development")
+        val employee = LoginEmployeeResponse(1, companyIdTest, Role.EMPLOYEE)
         val feedbackCreationRequest = FeedbackCreationRequest("Service Test", Timestamp.valueOf(LocalDateTime.now()), false, StatusType.UNREVIEWED)
         feedbackService.feedbackSubmission(feedbackCreationRequest, employee)
         verify(feedbackDao).feedbackSubmission(feedbackCreationRequest, employee)

@@ -36,7 +36,7 @@ class FeedbackDao @Autowired constructor(private val sql: DSLContext) {
             .where(feedbackTable.companyId.eq(companyId))
             .fetch(feedbackConfigurationMapper)
 
-    fun feedbackSubmission(feedbackCreationRequest: FeedbackCreationRequest, employee: Employee): Long {
+    fun feedbackSubmission(feedbackCreationRequest: FeedbackCreationRequest, employee: LoginEmployeeResponse): Long {
         return sql.insertInto(feedbackTable)
             .set(feedbackTable.employeeId, employee.id)
             .set(feedbackTable.companyId, employee.companyId)
