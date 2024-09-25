@@ -76,6 +76,5 @@ data class LoginEmployeeResponse(
 data class FilterOption(
     val date: LocalDate? = null,
     val department: String? = null,
-    val anonymityStatus: Boolean? = null,
-    val status: StatusType? = null,
+    val anonymityStatus: Boolean? = null
 )

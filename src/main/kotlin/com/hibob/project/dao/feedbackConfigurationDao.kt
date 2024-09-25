@@ -42,7 +42,7 @@ class FeedbackDao @Autowired constructor(private val sql: DSLContext) {
             .set(feedbackTable.employeeId, employee.id)
             .set(feedbackTable.companyId, employee.companyId)
             .set(feedbackTable.text, feedbackCreationRequest.text)
-            .set(feedbackTable.creationTime, Timestamp.valueOf(LocalDateTime.now().withNano(0)))
+            .set(feedbackTable.creationTime, Timestamp.valueOf(LocalDateTime.now().withSecond(0).withNano(0)))
             .set(feedbackTable.isAnonymous, feedbackCreationRequest.isAnonymous)
             .set(feedbackTable.status, feedbackCreationRequest.status.name)
             .returning(feedbackTable.id)
@@ -66,7 +66,6 @@ class FeedbackDao @Autowired constructor(private val sql: DSLContext) {
         dateFilter(query, filterOption)
         departmentFilter(query, filterOption)
         anonymityStatusFilter(query, filterOption)
-        statusFilter(query, filterOption)
 
         return query.fetch(feedbackConfigurationMapper)
     }
@@ -90,13 +89,7 @@ class FeedbackDao @Autowired constructor(private val sql: DSLContext) {
 
     private fun anonymityStatusFilter(query: SelectConditionStep<*>, filterOption: FilterOption) {
         filterOption.anonymityStatus?.let {
-            query.and(feedbackTable.isAnonymous.eq(filterOption.anonymityStatus))
-        }
-    }
-
-    private fun statusFilter(query: SelectConditionStep<*>, filterOption: FilterOption) {
-        filterOption.status?.let {
-            query.and(feedbackTable.status.eq(it.name))
+            query.and(feedbackTable.isAnonymous.eq(it))
         }
     }
 
