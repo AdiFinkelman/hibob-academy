@@ -3,6 +3,7 @@ package com.hibob.project.resource
 import com.hibob.project.dao.*
 import com.hibob.project.service.FeedbackService
 import com.hibob.project.utils.AuthenticationUtil
+import com.hibob.project.utils.RoleValidationUtil
 import jakarta.ws.rs.*
 import jakarta.ws.rs.container.ContainerRequestContext
 import jakarta.ws.rs.core.Context
@@ -19,8 +20,9 @@ class FeedbackResource(private val feedbackService: FeedbackService) {
     @GET
     fun getAllFeedbacks(@Context requestContext: ContainerRequestContext): Response {
         val authenticatedEmployee = AuthenticationUtil.extractAuthenticatedEmployee(requestContext)
+        val allowedRoles = setOf(Role.HR, Role.ADMIN)
 
-        if (isRoleValid(authenticatedEmployee.role)) {
+        if (RoleValidationUtil.isRoleValid(authenticatedEmployee.role, allowedRoles)) {
             val feedbacks = feedbackService.getAllFeedbacks(authenticatedEmployee.companyId)
 
             return Response.ok(feedbacks).build()
@@ -37,9 +39,5 @@ class FeedbackResource(private val feedbackService: FeedbackService) {
         feedbackService.feedbackSubmission(feedbackCreationRequest, authenticatedEmployee)
 
         return Response.ok(feedbackCreationRequest).build()
-    }
-
-    private fun isRoleValid(role: Role): Boolean {
-        return (role == Role.ADMIN || role == Role.HR)
     }
 }
