@@ -27,6 +27,13 @@ data class Comment(
     val creationTime: Timestamp,
 )
 
+data class CommentCreationRequest(
+    val employeeId: Long,
+    val text: String,
+    val feedbackId: Long,
+    val creationTime: Timestamp,
+)
+
 data class Feedback(
     val feedbackConfiguration: FeedbackConfiguration,
     val commentList: List<Comment>
