@@ -39,6 +39,10 @@ data class Feedback(
     val commentList: List<Comment>
 )
 
+data class StatusResponse(
+    val status: StatusType
+)
+
 enum class StatusType {
     REVIEWED, UNREVIEWED
 }
