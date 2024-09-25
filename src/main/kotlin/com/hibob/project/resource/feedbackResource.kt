@@ -2,6 +2,7 @@ package com.hibob.project.resource
 
 import com.hibob.project.dao.*
 import com.hibob.project.service.FeedbackService
+import com.hibob.project.utils.AuthenticationUtil
 import jakarta.ws.rs.*
 import jakarta.ws.rs.container.ContainerRequestContext
 import jakarta.ws.rs.core.Context
@@ -15,30 +16,21 @@ import org.springframework.stereotype.Controller
 @Consumes(MediaType.APPLICATION_JSON)
 class FeedbackResource(private val feedbackService: FeedbackService) {
     @GET
-    @Path("/{companyId}")
-    fun getAllFeedbacks(@PathParam("companyId") companyId: Long): Response {
-        feedbackService.getAllFeedbacks(companyId)
+    fun getAllFeedbacks(@Context requestContext: ContainerRequestContext): Response {
+        val authenticatedEmployee = AuthenticationUtil.extractAuthenticatedEmployee(requestContext)
+        if (authenticatedEmployee.role == Role.ADMIN || authenticatedEmployee.role == Role.HR) {
+            val feedbacks = feedbackService.getAllFeedbacks(authenticatedEmployee.companyId)
+            return Response.ok(feedbacks).build()
+        }
 
         return Response.ok().build()
     }
 
     @POST
     fun feedbackSubmission(@Context requestContext: ContainerRequestContext, feedbackCreationRequest: FeedbackCreationRequest): Response {
-        val authenticatedEmployee = authenticateEmployee(requestContext)
+        val authenticatedEmployee = AuthenticationUtil.extractAuthenticatedEmployee(requestContext)
         feedbackService.feedbackSubmission(feedbackCreationRequest, authenticatedEmployee)
 
         return Response.ok(feedbackCreationRequest).build()
-    }
-
-    private fun authenticateEmployee(requestContext: ContainerRequestContext): LoginEmployeeResponse {
-        val employeeId = requestContext.getProperty("employeeId") as Long
-        val companyId = requestContext.getProperty("companyId") as Long
-        val role = requestContext.getProperty("role") as Role
-
-        return LoginEmployeeResponse(
-            id = employeeId,
-            companyId = companyId,
-            role = role
-        )
     }
 }
