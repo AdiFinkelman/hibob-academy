@@ -14,7 +14,7 @@ class FeedbackDaoTest @Autowired constructor(private val sql: DSLContext) {
     private val feedbackDao = FeedbackDao(sql)
     private val feedbackTable = FeedbackConfigurationTable.instance
     private val companyIdTest = 1234L
-    private val userTest = Employee(1, "Adi", "Finkelman", Role.EMPLOYEE, companyIdTest, "development")
+    private val userTest = LoginEmployeeResponse(1, companyIdTest, Role.EMPLOYEE)
 
     @Test
     fun `submit feedback successfully`() {
