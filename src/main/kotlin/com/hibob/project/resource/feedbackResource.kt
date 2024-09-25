@@ -40,4 +40,22 @@ class FeedbackResource(private val feedbackService: FeedbackService) {
 
         return Response.ok(feedbackCreationRequest).build()
     }
+
+    @PUT
+    @Path("/status/{feedbackId}")
+    fun markFeedbackStatue(@Context requestContext: ContainerRequestContext, @PathParam("feedbackId") feedbackId: Long, statusResponse: StatusResponse): Response {
+        val authenticatedEmployee = AuthenticationUtil.extractAuthenticatedEmployee(requestContext)
+        feedbackService.markFeedbackStatus(feedbackId, statusResponse.status, authenticatedEmployee.companyId)
+
+        return Response.ok().build()
+    }
+
+    @GET
+    @Path("/status/{feedbackId}")
+    fun checkFeedbackStatus(@Context requestContext: ContainerRequestContext, @PathParam("feedbackId") feedbackId: Long,): Response {
+        val authenticatedEmployee = AuthenticationUtil.extractAuthenticatedEmployee(requestContext)
+        val statusResponse = feedbackService.checkFeedbackStatus(feedbackId, authenticatedEmployee.companyId)
+
+        return Response.ok(statusResponse.status).build()
+    }
 }
