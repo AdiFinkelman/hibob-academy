@@ -9,8 +9,7 @@ import org.springframework.stereotype.Component
 @Component
 class EmployeeDao(private val sql: DSLContext) {
     private val employeeTable = EmployeesTable.instance
-    private val employeeMapper = RecordMapper<Record, Employee>
-    { record ->
+    private val employeeMapper = RecordMapper<Record, Employee> { record ->
         Employee(
             id = record[employeeTable.id],
             firstName = record[employeeTable.firstName],

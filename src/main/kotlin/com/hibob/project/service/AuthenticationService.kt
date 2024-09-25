@@ -14,13 +14,10 @@ const val ONE_DAY_MILLIS = 60 * 60 * 24
 
 @Component
 class AuthenticationService(private val employeeDao: EmployeeDao) {
-    companion object
-
-    val secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
+    companion object val secretKey = Keys.secretKeyFor(SignatureAlgorithm.HS256)
     val now = Date.from(Instant.now())
 
     fun createJwtToken(employee: Employee?): String {
-
         return Jwts.builder()
             .setHeaderParam("typ", "JWT")
             .claim("employeeId", employee?.id)

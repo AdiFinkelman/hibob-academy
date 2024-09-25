@@ -1,6 +1,5 @@
 package com.hibob.academy.filters
 
-import com.hibob.academy.service.SessionService
 import com.hibob.project.dao.Role
 import com.hibob.project.service.AuthenticationService
 import io.jsonwebtoken.Claims
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component
 @Component
 @Provider
 class AuthenticationFilter(private val authService: AuthenticationService) : ContainerRequestFilter {
-
     companion object {
         const val LOGIN_PATH = "api/system/login"
         const val AUTH = "Authorization"
@@ -43,7 +41,7 @@ class AuthenticationFilter(private val authService: AuthenticationService) : Con
 
             val employeeId = (claims["employeeId"] as? Int)?.toLong()
             val companyId = (claims["companyId"] as? Int)?.toLong()
-            val role = enumValueOf<Role>(claims["role"] as String)
+            val role = enumValueOf<Role>((claims["role"] as String).uppercase())
 
             requestContext.setProperty("employeeId", employeeId)
             requestContext.setProperty("companyId", companyId)
