@@ -45,9 +45,16 @@ class FeedbackResource(private val feedbackService: FeedbackService) {
     @Path("/status/{feedbackId}")
     fun markFeedbackStatue(@Context requestContext: ContainerRequestContext, @PathParam("feedbackId") feedbackId: Long, statusResponse: StatusResponse): Response {
         val authenticatedEmployee = AuthenticationUtil.extractAuthenticatedEmployee(requestContext)
-        feedbackService.markFeedbackStatus(feedbackId, statusResponse.status, authenticatedEmployee.companyId)
+        val allowedRoles = setOf(Role.HR)
 
-        return Response.ok().build()
+        if (RoleValidationUtil.isRoleValid(authenticatedEmployee.role, allowedRoles)) {
+            feedbackService.markFeedbackStatus(feedbackId, statusResponse.status, authenticatedEmployee.companyId)
+            return Response.ok().build()
+        }
+
+        return Response.status(Response.Status.UNAUTHORIZED)
+            .entity("Employee doesnt have permission")
+            .build()
     }
 
     @GET

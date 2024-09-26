@@ -31,7 +31,7 @@ class FeedbackService @Autowired constructor(private val feedbackDao: FeedbackDa
         val feedback = feedbackDao.getAllFeedbacks(companyId).find { it.id == feedbackId }
             ?: throw NotFoundException("Feedback not found")
 
-        if (!feedback.isAnonymous) {
+        if (feedback.isAnonymous) {
             val statusResponse = feedbackDao.checkStatus(feedback)
 
             return statusResponse
