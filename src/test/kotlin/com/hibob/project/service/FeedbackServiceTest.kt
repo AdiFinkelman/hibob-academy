@@ -1,6 +1,8 @@
 package com.hibob.project.service
 
 import com.hibob.project.dao.*
+import jakarta.ws.rs.BadRequestException
+import jakarta.ws.rs.NotFoundException
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.Test
@@ -50,5 +52,56 @@ class FeedbackServiceTest {
         val feedbackCreationRequest = FeedbackCreationRequest("Service Test", Timestamp.valueOf(LocalDateTime.now()), false, StatusType.UNREVIEWED)
         feedbackService.feedbackSubmission(feedbackCreationRequest, employee)
         verify(feedbackDao).feedbackSubmission(feedbackCreationRequest, employee)
+    }
+
+    @Test
+    fun `mark feedback status`() {
+        val feedbackId = 1L
+        val status = StatusType.REVIEWED
+        val feedbackConfiguration = FeedbackConfiguration(feedbackId, 1, companyIdTest, "Service test", Timestamp.valueOf(LocalDateTime.now()), false, StatusType.UNREVIEWED)
+        whenever(feedbackDao.getAllFeedbacks(companyIdTest)).thenReturn(listOf(feedbackConfiguration))
+        feedbackService.markFeedbackStatus(feedbackId, status, feedbackConfiguration.companyId)
+        verify(feedbackDao).markFeedbackStatus(feedbackConfiguration, status)
+    }
+
+    @Test
+    fun `mark feedback status when feedback is anonymous`() {
+        val feedbackConfiguration = FeedbackConfiguration(1, 1, companyIdTest, "Service test", Timestamp.valueOf(LocalDateTime.now()), true, StatusType.UNREVIEWED)
+        val status = StatusType.REVIEWED
+        whenever(feedbackDao.getAllFeedbacks(companyIdTest)).thenReturn(listOf(feedbackConfiguration))
+        val expectedMessage = assertThrows<BadRequestException> { feedbackService.markFeedbackStatus(feedbackConfiguration.id, status, feedbackConfiguration.companyId) }
+        assertEquals("Feedback marked as anonymous", expectedMessage.message)
+    }
+
+    @Test
+    fun `mark feedback status when feedback is not exist`() {
+        val feedbackId = 123L
+        val status = StatusType.REVIEWED
+        val expectedMessage = assertThrows<NotFoundException> { feedbackService.markFeedbackStatus(feedbackId, status, companyIdTest) }
+        assertEquals("Feedback not found", expectedMessage.message)
+    }
+
+    @Test
+    fun `view feedback status successfully`() {
+        val feedbackConfiguration = FeedbackConfiguration(1, 1, companyIdTest, "Service test", Timestamp.valueOf(LocalDateTime.now()), false, StatusType.UNREVIEWED)
+        whenever(feedbackDao.getAllFeedbacks(companyIdTest)).thenReturn(listOf(feedbackConfiguration))
+        whenever(feedbackDao.checkStatus(feedbackConfiguration)).thenReturn(StatusResponse(StatusType.UNREVIEWED))
+        feedbackService.checkFeedbackStatus(feedbackConfiguration.id, feedbackConfiguration.companyId)
+        assertEquals(StatusResponse(StatusType.UNREVIEWED), feedbackDao.checkStatus(feedbackConfiguration))
+    }
+
+    @Test
+    fun `view feedback status when feedback is anonymous`() {
+        val feedbackConfiguration = FeedbackConfiguration(1, 1, companyIdTest, "Service test", Timestamp.valueOf(LocalDateTime.now()), true, StatusType.UNREVIEWED)
+        whenever(feedbackDao.getAllFeedbacks(companyIdTest)).thenReturn(listOf(feedbackConfiguration))
+        val expectedMessage = assertThrows<BadRequestException> { feedbackService.checkFeedbackStatus(feedbackConfiguration.id, feedbackConfiguration.companyId) }
+        assertEquals("Feedback marked as anonymous", expectedMessage.message)
+    }
+
+    @Test
+    fun `view feedback status when feedback is not exist`() {
+        val feedbackId = 123L
+        val expectedMessage = assertThrows<NotFoundException> { feedbackService.checkFeedbackStatus(feedbackId, companyIdTest) }
+        assertEquals("Feedback not found", expectedMessage.message)
     }
 }
